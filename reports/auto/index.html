@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Autocomplete</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+  <style>
+    select { width: 350px; }
+    .overflow { height: 200px; }
+    #number {
+        background: transparent;
+        font-size: 15px;
+        border: 2px solid #3498db;
+}
+  </style>
+  <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<body>
+
+<select name="number" id="number">
+  <option value="1" selected>Обучения компаний вендоров</option>
+  <option value="2">Отдел подбора и обучения Воронеж</option>
+  <option value="3">Связной - Учебный центр Дальний Восток</option>
+  <option value="4">Связной - Учебный центр Поволжье</option>
+  <option value="5">Связной - Учебный центр Республика Беларусь</option>
+  <option value="6">Связной - Учебный центр Санкт-Петербург</option>
+  <option value="7">Связной - Учебный центр Сибирь</option>
+  <option value="8">Связной - Учебный центр Урал</option>
+  <option value="9">Связной - Учебный центр ЦР</option>
+  <option value="10">Связной - Учебный центр Юг</option>
+</select>
+
+<script>
+$( "#number" )
+  .selectmenu()
+  .selectmenu( "menuWidget" )
+    .addClass( "overflow" );
+</script>
+ 
+</body>
+</html>

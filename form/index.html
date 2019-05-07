@@ -1,0 +1,146 @@
+﻿<%
+    ac = Random(1,999);
+    var SQL = "sql:
+
+	SELECT DISTINCT
+		s.id
+		,ss.name
+	FROM subdivisions ss
+		JOIN subdivision s ON s.id = ss.id
+		JOIN collaborators cs ON cs.position_parent_id = s.id
+	WHERE ss.org_id = 6678975295790676989
+		AND s.data.value('(//custom_elems/custom_elem[name=''tt_code'']/value)[1]', 'varchar(10)') IS NOT NULL
+    ORDER BY ss.name
+    ";
+    var aSS = XQuery(SQL);
+%>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/scripts/bootstrap/bootstrap-select/css/animate.css">
+    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/scripts/bootstrap/bootstrap-select/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/scripts/bootstrap/bootstrap-select/css/bs.min.css">
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/scripts/jquery-3.4.0.min.js?<%=ac%>"></script>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/scripts/popper.min.js?<%=ac%>"></script>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/scripts/bootstrap/js/bootstrap.min.js?<%=ac%>"></script>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/scripts/bootstrap/bootstrap-select/bootstrap-select.min.js?<%=ac%>"></script>
+    <script>
+
+        $(document).ready(function(){
+          $("#submit").click(function() {
+            let R = $.ajax({
+              url: 'http://msdo.maxus.ru/portal/form/create_collaborator.html'
+              ,method: 'POST'
+              ,data: {
+                firstname: $('#firstname').val()
+                ,middlename: $('#middlename').val()
+                ,lastname: $('#lastname').val()
+                ,birth_date: $('#birth_date').val()
+                ,position_parent_id: $('#position_parent_id').val()
+                ,login: $('#login').val()
+                ,password: $('#password').val()
+              }
+              ,success: function() {
+                alert('Стажёр создан!');
+              }
+            });
+          });
+          });
+
+    </script>
+</head>
+<body>
+<div class="row">
+<div class="col-sm-6 col-sm-offset-3">
+    <div class="well" style="width: 60%; margin: 0 auto;">
+    <form role="form" autocomplete='off' id="contactForm" data-toggle="validator" class="shake">
+        <div class="row">
+                <div class="form-group col-sm-12">
+                        <label for="date" class="h4">Торговая точка:</label>
+                        <select class="selectpicker" data-live-search="true" id="position_parent_id" data-width="100%">
+                            <option selected disabled value='0'>Выберите из списка</option>
+        <%
+                            for (elem in aSS) {
+        %>
+                            <option value='<%=elem.id%>'><%=elem.name%></option>
+        <%
+                            }
+        %>
+                        </select>
+                    </div>
+            <div class="form-group col-sm-12">
+                <label for="name" class="h4">Имя</label>
+                <input autocomplete='off' type="text" onkeyup="check();" class="form-control" id="firstname" placeholder="Имя" data-error="Не заполнено" pattern="[А-Яа-яЁё]+"">
+                <div class="help-block with-errors"></div>
+            </div>
+            <div class="form-group col-sm-12">
+                <label for="name" class="h4">Фамилия</label>
+                <input autocomplete='off' type="text" onkeyup="check();" class="form-control" id="lastname" placeholder="Фамилия" data-error="Не заполнено" pattern="[А-Яа-яЁё]+"">
+                <div class="help-block with-errors"></div>
+            </div>
+            <div class="form-group col-sm-12">
+                <label for="name" class="h4">Отчество</label>
+                <input autocomplete='off' type="name" onkeyup="check();" class="form-control" id="middlename" placeholder="Отчество" data-error="Не заполнено" pattern="[А-Яа-яЁё]+">
+                <div class="help-block with-errors"></div>
+            </div>
+            <div class="form-group col-sm-12">
+                <label for="email" class="h4">Логин</label>
+                <input autocomplete='off' type="name" onkeyup="check();" class="form-control" id="login" placeholder="Логин" data-error="Не заполнено" pattern="[A-Za-z0-9]+">
+                <div class="help-block with-errors"></div>
+            </div>
+            <div class="form-group col-sm-11">
+                <label for="password" class="h4">Пароль</label>
+                <input autocomplete='off' type="password" onkeyup="check();" class="form-control" id="password" placeholder="Пароль" data-error="Не заполнено" pattern="[A-Za-z0-9]+">
+                <div class="help-block with-errors"></div>
+            </div>
+            <div class="form-group col-sm">
+                <i class="fa fa-eye" aria-hidden="true" onkeyup="check();" onclick="myFunction()" style="cursor: pointer; background-color: #fff; padding: 12px; margin: 42px -12px; border: 1px solid #dce4ec; border-radius: 3px;"></i>
+            </div>
+            <div class="form-group col-sm-12" style="margin-top: -30px;">
+                <label for="date" class="h4">Дата рождения:</label>
+                <input type="date" class="form-control" onkeyup="check();" id="birth_date" placeholder="Дата рождения">
+            </div>
+
+            <div class="form-group col-sm-12">
+                <button type="button" disabled="disabled" id="submit" class="btn btn-success btn-m pull-right">Сохранить</button>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>
+</div>
+</body>
+<script>
+    function myFunction() {
+        var x = document.getElementById("password");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+    function check() {
+        var pole1 = document.getElementById('firstname'),
+            pole2 = document.getElementById('lastname'),
+            pole3 = document.getElementById('middlename'),
+            pole4 = document.getElementById('login'),
+            pole5 = document.getElementById('password');
+        document.getElementById('submit').disabled = pole1.value && pole2.value && pole3.value && pole4.value && pole5.value ? false : "disabled";
+    $('#submit').click(function() {
+        $(':input','#contactForm')
+            .not(':button, :submit, :reset, :hidden')
+            .val('')
+            .removeAttr('checked')
+            .removeAttr('selected');
+        document.getElementById('submit').disabled = true;
+        })
+    }
+
+</script>
+<script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/scripts/validator.min.js?<%=ac%>" async='false'></script>
+<script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/scripts/form-scripts.js?<%=ac%>" async='false'></script>
+</html>

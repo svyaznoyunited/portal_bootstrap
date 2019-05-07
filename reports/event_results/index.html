@@ -1,0 +1,116 @@
+<html>
+<head>
+  <meta charset="utf-8">
+<%
+  var Q = XQuery("sql:
+    SELECT
+      id
+      ,name
+    FROM education_orgs
+    WHERE name != ''
+  ");
+
+  ORGANS = new Array();
+
+  for (elem in Q) {
+    ORGANS.push({id: Int(elem.id), name: EncodeCharset(elem.name, 'utf-8')});
+  }
+%>
+</head>
+<script src="http://<%=Request.UrlHost%>/portal/scripts/jquery-3.4.0.min.js"></script>
+<script src="http://<%=Request.UrlHost%>/portal/scripts/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<link rel='stylesheet' href='http://<%=Request.UrlHost%>/portal/scripts/jquery-ui-1.12.1/jquery-ui.min.css'>
+<script>
+
+  var education_orgs = <%=tools.object_to_text( ORGANS, 'json' )%>;
+
+  function getEvents(id) {
+
+    $('#orgs').html('');
+
+    $.ajax({
+      url: "http://<%=Request.UrlHost%>/portal/reports/event_results/ajax.html"
+      ,method: 'POST'
+      ,data: {orgid: id}
+      ,success: function(e) {
+        let elems = JSON.parse(e);
+
+        if (elems.lenth = 0) {
+          alert('Мероприятия не найдены')
+          return false;
+        }
+
+        for ( i in elems ) {
+          $('<option>', {value: elems[i].id}).append( elems[i].name ).appendTo('#events');
+        }
+
+         $('#events').selectmenu({
+          change: function(event, ui) {
+            //getEvents(ui.item.value);
+          }
+        });
+
+        //$('#events').fadeIn(500);
+      }
+      ,error: function(a,b,c) {
+        console.log(a + b + c);
+      }
+    })
+
+  }
+
+  $(document).ready(function() {
+
+    for (i in education_orgs) {
+      $('<option>', {value: education_orgs[i].id}).append( education_orgs[i].name ).appendTo('#orgs');
+    }
+
+    $('#orgs').selectmenu({
+      change: function(event, ui) {
+        getEvents(ui.item.value);
+      }
+    });
+  });
+
+  $( function() {
+    var dateFormat = "mm/dd/yy",
+      from = $( "#from" )
+        .datepicker({
+          defaultDate: "+1w",
+          changeMonth: true,
+          numberOfMonths: 3
+        })
+        .on( "change", function() {
+          to.datepicker( "option", "minDate", getDate( this ) );
+        }),
+          to = $( "#to" ).datepicker({
+            defaultDate: "+1w",
+            changeMonth: true,
+            numberOfMonths: 3
+        })
+        .on( "change", function() {
+          from.datepicker( "option", "maxDate", getDate( this ) );
+        });
+ 
+        function getDate( element ) {
+          var date;
+          try {
+            date = $.datepicker.parseDate( dateFormat, element.value );
+          } catch( error ) {
+            date = null;
+          }
+ 
+        return date;
+      }
+    } );
+
+</script>
+
+<body>
+    <select id="orgs" class=''></select>
+    <select id="events" class="invisible"></select>
+    <label for="from">Дата с:</label>
+    <input type="text" id="from" name="from">
+    <label for="to">До</label>
+    <input type="text" id="to" name="to">
+</body>

@@ -1,0 +1,5 @@
+<%
+    var SQL = "sql: " + Request.Query.GetOptProperty('sql', 'select GETDATE() as date');
+    var RESPONSE = XQuery(SQL);
+    Response.Write(tools.object_to_text(RESPONSE, 'json'));
+%>
