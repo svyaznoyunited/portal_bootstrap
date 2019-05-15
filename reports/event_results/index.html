@@ -1,8 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
+﻿<!DOCTYPE html>
+<html>
 <head>
   <meta charset="utf-8">
-  <title>Form</title>
+  <title>Результаты мероприятий</title>
   <%
   ac = Random(1,999);
   var Learnings = {};
@@ -15,21 +15,26 @@
   %>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/animate.css">
-  <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bootstrap.min.css">
-  <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bs.min.css">
-  <link rel='stylesheet' href='http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.css?<%=ac%>'>
-  <link rel='stylesheet' href='http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.css?<%=ac%>'>
-  <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-3.4.0.min.js?<%=ac%>"></script>
-  <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/popper.min.js?<%=ac%>"></script>
-  <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/js/bootstrap.min.js?<%=ac%>"></script>
-  <script src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.js?<%=ac%>"></script>
-  <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/bootstrap-select.min.js?<%=ac%>"></script>
-  <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.js?<%=ac%>"></script>
-  <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/dataTables.buttons.min.js?<%=ac%>"></script>
-  <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/buttons.html5.min.js?<%=ac%>"></script>
-  <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jszip.min.js?<%=ac%>"></script>
-  <script>
+  <!-- jQuery -->
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-3.4.0.min.js?<%=ac%>"></script>
+    <!-- jQuery UI -->
+    <link rel='stylesheet' href='http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.css?<%=ac%>'>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.js?<%=ac%>"></script>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/animate.css">
+    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bs.min.css">
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/popper.min.js?<%=ac%>"></script>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/js/bootstrap.min.js?<%=ac%>"></script>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/bootstrap-select.min.js?<%=ac%>"></script>
+    <!-- DataTables -->
+    <link rel='stylesheet' href='http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.css?<%=ac%>'>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.js?<%=ac%>"></script>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/dataTables.buttons.min.js?<%=ac%>"></script>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/buttons.html5.min.js?<%=ac%>"></script>
+    <!-- Other scripts -->
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jszip.min.js?<%=ac%>"></script>
+    <script>
     var Orgs = <%=tools.object_to_text(Orgs, 'json')%>;
     var Learnings = <%=tools.object_to_text(Learnings, 'json')%>;
     $(document).ready(function(){
@@ -53,17 +58,6 @@
           ,$('#dateTo').val()
           ,$('#allowDissmissed')[0].checked
         );
-      });
-
-      $('#get_excel').click(function() {
-        $.ajax({
-          url: "http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/reports/event_results/get_excel.html"
-          ,method: 'POST'
-          ,contentType: 'application/vnd.ms-excel'
-          ,headers: {
-            'Content-Disposition': 'attachment;filename="ex.xls"'
-          }
-        });
       });
 
       $("#div_table_container").mousemove(function(e) {
@@ -134,7 +128,10 @@
           //,dataSrc: "data"
         }
         ,dom: 'Bfrtip'
-        ,buttons: ['excelHtml5']
+        ,buttons: [{
+                extend: 'excelHtml5',
+                title: `${dateFrom} - ${dateTo}`
+            }]
         ,"columns": [
           {data: "a"}
           ,{data: "b"}
@@ -174,7 +171,7 @@
   </style>
 </head>
 <body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
-  <div style="padding: 50px; margin: 2.8%; background-color: #fff; border: 10px solid transparent; border-radius: 5px;">
+  <div style="padding: 50px; margin: -12px 5px; background-color: #fff; border: 10px solid transparent;">
     <form role="form" autocomplete='off' id="contactForm" data-toggle="validator" class="shake">
         <div class="row">
           <div class="form-group col-sm-12">
@@ -253,6 +250,13 @@
       $('#dateTo').val(`${day}-${month.length > 1 ? month : '0' + month}-${year}`);
       $('#dateFrom').val(`${day}-${month.length > 1 ? month : '0' + month}-${year}`);
 
+      function parallax(event) {
+        this.querySelectorAll('.layer').forEach(layer => {
+          layer.style.transform = `translateX(${event.clientX/50}px)`
+        });;
+      }
+
+document.addEventListener('mousemove', parallax);
 
     });
 

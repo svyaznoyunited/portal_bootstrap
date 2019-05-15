@@ -36,7 +36,7 @@
     	,ers.is_assist AS 'i'
     FROM [events] es
     	JOIN event_results ers ON ers.event_id = es.id
-    	JOIN event_lectors els ON es.id = els.event_id
+    	LEFT JOIN event_lectors els ON es.id = els.event_id
     	JOIN collaborator c ON ers.person_id = c.id
     	JOIN collaborators cs ON cs.id = c.id
     	JOIN positions ps ON cs.position_id = ps.id

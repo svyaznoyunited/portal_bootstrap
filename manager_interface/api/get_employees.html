@@ -49,10 +49,10 @@
     		JOIN Hierarchy H ON ss.parent_object_id = H.id
     )
 
-    SELECT CAST(cs.id AS VARCHAR) AS person_id
-    	,cs.fullname
-    	,cs.position_name
-    	,cs.position_parent_name
+    SELECT CAST(cs.id AS VARCHAR) AS a
+    	,cs.fullname AS b
+    	,cs.position_name AS c
+    	,cs.position_parent_name AS d
     FROM Hierarchy H
     	JOIN collaborators cs ON cs.position_parent_id = H.id
     ";
@@ -63,14 +63,14 @@
       return { msg: "Person has no employees", q:[ qEmployees, qManagedSubdivision ] } ;
     }
 
-    return rEmployees;
+    return { data: rEmployees };
 
   }
 
   try {
-    Response.Write( tools.object_to_text( { data: __main__() }, 'json' ) );
+    Response.Write( tools.object_to_text( __main__(), 'json' ) );
   } catch(errMain) {
-    Response.Write( "{data: '" + errMain + "'}" );
+    Response.Write( "{data: [], msg:'" + errMain + "'}" );
   }
 
 %>

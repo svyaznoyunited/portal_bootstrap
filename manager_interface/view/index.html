@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -6,35 +6,124 @@
     <% ac = Random(1,999) %>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/animate.css">
-    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bootstrap.min.css">
-    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bs.min.css">
-    <link rel='stylesheet' href='http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.css?<%=ac%>'>
+
+    <!-- jQuery -->
     <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-3.4.0.min.js?<%=ac%>"></script>
+    <!-- jQuery UI -->
+    <link rel='stylesheet' href='http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.css?<%=ac%>'>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.js?<%=ac%>"></script>
+    <!-- DataTables -->
+    <link rel='stylesheet' href='http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.css?<%=ac%>'>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.js?<%=ac%>"></script>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/buttons.html5.min.js?<%=ac%>"></script>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/dataTables.buttons.min.js?<%=ac%>"></script>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/animate.css">
+    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bs.min.css">
     <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/popper.min.js?<%=ac%>"></script>
     <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/js/bootstrap.min.js?<%=ac%>"></script>
-    <script src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.js?<%=ac%>"></script>
     <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/bootstrap-select.min.js?<%=ac%>"></script>
+    <!-- Other scripts -->
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jszip.min.js?<%=ac%>"></script>
+
+    <!-- Custom CSS -->
+    <style media="screen">
+      @font-face {font-family: 'SvyaznoySans'; src: url(http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/fonts/SvyaznoySans-Medium.otf);}
+      table {width: 100%; margin-top: 2%; text-align: center; border-radius: 10px; border-collapse: separate; border-spacing: 5px; letter-spacing: 2px;}
+      table thead tr {color: #ffffff; background: #a770ef; font-family: 'SvyaznoySans'; font-size: 16px;}
+      table thead tr th {text-align: center;}
+      table tbody tr {cursor: pointer;}
+      table#myEmployees tbody tr:hover {background: #ffe8e8; transition-duration: 0.6s;}
+      table tr td {border-right: 1px solid #dfdfdf;}
+      table tr td:last-child {border-right: 0px;}
+      table tbody tr:nth-child(1n) {background: #f6f6f6;}
+      table tbody tr:nth-child(2n) {background: #e6e6e6;}
+      .sorting_asc, .sorting {text-align: center; font-weight: normal;}
+
+      .context_menu {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    </style>
+
+    <!-- Custom JS -->
     <script type="text/javascript">
 
       const _APPDIR = "http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/manager_interface/";
       const USER = "<%=String(Request.AuthUserID)%>"
+      const CONTEXTMENU = [
+        {
+          title: 'Пункт 1'
+          ,action: function(elem) {
+            alert(elem.id);
+          }
+        }
+        ,{
+          title: 'Пункт 1'
+          ,action: function(elem) {
+            alert(elem.id);
+          }
+        }
+      ];
+
+
       $(document).ready(function() {
-        $.ajax({
-          url: _APPDIR + "api/get_employees.html"
-          ,method: "POST"
-          ,data: {manager_id: USER}
-          ,success: function(jDATA) {
-            console.log(jDATA);
+
+        $('#myEmployees').dataTable().fnDestroy();
+
+        var employees = $('#myEmployees').DataTable({
+          "ajax" : {
+            "url": _APPDIR + "api/get_employees.html"
+            ,"method" : "POST"
+            ,"data": {
+              "manager_id" : USER
+            }
+            ,dataSrc: "data"
           }
-          ,error: function(a,b,c) {
-            console.log(a + b + c);
+          ,rowId: 'a'
+          ,dom: 'Bfrtip'
+          ,buttons: []
+          ,"columns": [
+            {data: "b"}
+            ,{data: "c"}
+            ,{data: "d"}
+          ]
+        });
+
+        $('#myEmployees tbody').on('click', 'tr', function (e) {
+
+          let aContextMenu = [];
+
+          for (menuElem in CONTEXTMENU) {
+            $('<div>', {'onclick': `CONTEXTMENU[${menuElem}()]`}).append(CONTEXTMENU[menuElem].title)
           }
+
+          $('<div>', {'class': 'context_menu', css: {
+            'top': e.posY
+            ,'left': e.posX
+          }}).append(aContextMenu).appendTo('body');
+
         });
       });
-
     </script>
   </head>
   <body>
+    <div class="row">
+      <div class="form-group col-sm-12">
+        <table id="myEmployees" class="table">
+          <thead>
+            <tr>
+              <th>ФИО</th>
+              <th>Должность</th>
+              <th>Подразделение</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+    <script type="text/javascript">
+    </script>
   </body>
 </html>
