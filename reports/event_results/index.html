@@ -47,7 +47,6 @@
       $('#submit').click(function() {
         document.getElementById('submit').disabled = true;
         $("#table").fadeOut(300);
-        $("#loader").fadeIn(300);
         getEvents(
           $('#learnings').val()
           ,$('#dateFrom').val()
@@ -78,8 +77,6 @@
           $("#div_table_container").css('cursor', 'e-resize');
         }
       });
-
-      $("#loader").fadeOut(300);
 
     });
     $( function() {
@@ -117,11 +114,10 @@
 
     function getEvents(eventId, dateFrom, dateTo, allowDissmissed) {
 
-      $('#table_content').html('');
+      $('#table').dataTable().fnDestroy()
 
       if ( !eventId ||  !dateFrom ) {
         document.getElementById('submit').disabled = false;
-        $("#loader").fadeOut(300);
         return false;
       }
 
@@ -151,7 +147,6 @@
           ,{data: "i"}
         ]
       });
-      $("#loader").fadeOut(300);
       $("#table").fadeIn(300);
       document.getElementById('submit').disabled = false;
     }
@@ -216,7 +211,6 @@
                 <button type="button" id="submit" class="btn btn-info btn-m pull-right" style="border: 3px solid #fff; border-radius: 5px;">Сформировать</button>
             </div>
             <div class="form-group col-sm-12" ID="div_table_container" style="overflow-x: hidden;">
-                <div class="loader" id='loader' style="margin: 0 auto; border: 5px solid #f3f3f3; border-radius: 50%; border-top: 5px solid #4c1e87; width: 50px; height: 50px; -webkit-animation: spin 1s linear infinite; /* Safari */ animation: spin 1s linear infinite;"></div>
                 <table class="table" id="table">
                     <thead>
                       <tr id="table_head">
