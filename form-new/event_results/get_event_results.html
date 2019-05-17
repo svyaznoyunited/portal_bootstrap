@@ -1,0 +1,60 @@
+<%
+
+  var event_id = SqlLiteral( Request.Query.GetProperty( "event_id" ) );
+  var date_from = SqlLiteral( Request.Query.GetProperty( "from" ) );
+  var date_to = SqlLiteral( Request.Query.GetProperty( "to" ) );
+  var is_dismiss = Request.Query.GetProperty( "is_dismiss" );
+
+  var theads = {
+    a   : "Обучение"
+    ,b  : "Окончено"
+    ,c  : "Тренер"
+    ,d  : "Табельный номер"
+    ,e  : "ФИО"
+    ,f  : "Должность"
+    ,g  : "Подразделение"
+    ,h  : "Код ТТ"
+    ,i  : "Присутствовал"
+  }
+
+  var SQL = "sql: ";
+
+  SQL += "\nDECLARE @event_id BIGINT = " + event_id;
+  SQL += "\nDECLARE @dateFrom DATE = CONVERT(DATE, " + date_from + ", 104)";
+  SQL += "\nDECLARE @dateTo DATE = CONVERT(DATE, " + date_to + ", 104)";
+  SQL += "\n";
+  SQL += "
+    SELECT
+    	ers.event_name AS 'a'
+    	,CAST(CONVERT(DATE, es.finish_date, 104) AS VARCHAR) AS 'b'
+    	,els.person_fullname AS 'c'
+    	,c.[data].value('(//custom_elems/custom_elem[name=''tab_number'']/value)[1]', 'varchar(20)') AS 'd'
+    	,cs.fullname AS 'e'
+    	,ps.[name] AS 'f'
+    	,cs.position_parent_name AS 'g'
+    	,s.[data].value('(//custom_elems/custom_elem[name=''tt_code'']/value)[1]', 'varchar(10)') AS 'h'
+    	,ers.is_assist AS 'i'
+    FROM [events] es
+    	JOIN event_results ers ON ers.event_id = es.id
+    	LEFT JOIN event_lectors els ON es.id = els.event_id
+    	JOIN collaborator c ON ers.person_id = c.id
+    	JOIN collaborators cs ON cs.id = c.id
+    	JOIN positions ps ON cs.position_id = ps.id
+    	JOIN subdivision s ON s.id = cs.position_parent_id
+    WHERE es.education_method_id = @event_id
+  ";
+  SQL += "AND CONVERT(DATE, es.finish_date, 104) BETWEEN @dateFrom  AND @dateTo";
+  if (is_dismiss == "false") {
+    SQL += "\nAND cs.is_dismiss = 0";
+  }
+
+  var R = XQuery(SQL);
+
+  var data = {
+    table_heads: theads
+    , data: R
+    , query: SQL
+  }
+  Response.Write( tools.object_to_text( data, 'json' ) );
+
+%>

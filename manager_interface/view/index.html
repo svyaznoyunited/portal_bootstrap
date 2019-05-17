@@ -26,52 +26,98 @@
     <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/bootstrap-select.min.js?<%=ac%>"></script>
     <!-- Other scripts -->
     <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jszip.min.js?<%=ac%>"></script>
+    <script src="//cdn.jsdelivr.net/gh/mar10/jquery-ui-contextmenu@v1/jquery.ui-contextmenu.min.js"></script>
 
     <!-- Custom CSS -->
     <style media="screen">
       @font-face {font-family: 'SvyaznoySans'; src: url(http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/fonts/SvyaznoySans-Medium.otf);}
+      body {font-family: 'SvyaznoySans'!important; font-weight: 100}
       table {width: 100%; margin-top: 2%; text-align: center; border-radius: 10px; border-collapse: separate; border-spacing: 5px; letter-spacing: 2px;}
-      table thead tr {color: #ffffff; background: #a770ef; font-family: 'SvyaznoySans'; font-size: 16px;}
+      table thead tr {color: #ffffff; background: #a770ef;font-size: 16px; font-weight: normal;}
       table thead tr th {text-align: center;}
-      table tbody tr {cursor: pointer;}
+      table tbody tr {cursor: pointer; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-weight: 400}
       table#myEmployees tbody tr:hover {background: #ffe8e8; transition-duration: 0.6s;}
       table tr td {border-right: 1px solid #dfdfdf;}
       table tr td:last-child {border-right: 0px;}
       table tbody tr:nth-child(1n) {background: #f6f6f6;}
       table tbody tr:nth-child(2n) {background: #e6e6e6;}
-      .sorting_asc, .sorting {text-align: center; font-weight: normal;}
-
-      .context_menu {
+      .sorting_asc, .sorting_desc, .sorting {text-align: center; font-weight: normal; letter-spacing: 3px; font-size: 13px; text-transform: uppercase;}
+      #context-menu {
         position: absolute;
-        top: 0;
-        left: 0;
+        top: 0px;
+        left: 0px;
+        display: none;
+        background: #a770ef;
+        border-radius: 2px;
+        letter-spacing: 1px;
+        color: #fefefe;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-weight: 400;
       }
-    </style>
+
+      .context-menu-element {
+        padding: 5px 15px;
+        cursor: pointer;
+        transition: 300ms linear;
+      }
+
+      .context-menu-element:hover {
+        background-color: #cf8bf3;
+      }
+
+
+
+      </style>
 
     <!-- Custom JS -->
     <script type="text/javascript">
 
       const _APPDIR = "http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/manager_interface/";
-      const USER = "<%=String(Request.AuthUserID)%>"
-      const CONTEXTMENU = [
-        {
-          title: 'Пункт 1'
-          ,action: function(elem) {
-            alert(elem.id);
+      const USER = "<%=String(Request.AuthUserID)%>";
+
+      const CNTXMN = [
+        {name: 'action_1', title:'Действие 1', class: ""}
+        ,{name: 'action_2', title:'Действие 2', class: ""}
+        ,{name: 'action_3', title:'Действие 3', class: ""}
+      ]
+
+      class ContextMenu {
+        constructor(a) {
+          this.isActive = false;
+          this.cm_config = a;
+          this.domObject = $('<div>', {id: "context-menu"});
+          for (var i in a) {
+            $('<div>', {id: a[i].name, 'class': `context-menu-element ${a[i].class}`, 'data-params': ''}).append(a[i].title).appendTo(this.domObject);
+          }
+          $(this.domObject).appendTo('body');
+        }
+
+        showMenu(e) {
+          try {
+            if (this.isActive) {
+              this.hideMenu();
+            }
+            $(this.domObject).css('top', e.pageY);
+            $(this.domObject).css('left', e.pageX);
+            $(this.domObject).slideDown(100);
+            this.isActive = true;
+          } catch (errShowContextMenu) {
+            console.error(errShowContextMenu);
+            this.isActive = false;
           }
         }
-        ,{
-          title: 'Пункт 1'
-          ,action: function(elem) {
-            alert(elem.id);
-          }
+
+        hideMenu(e) {
+          $(this.domObject).slideUp(1);
+          this.isActive = false;
         }
-      ];
 
-
+      }
+      let C;
       $(document).ready(function() {
 
         $('#myEmployees').dataTable().fnDestroy();
+
+        C = new ContextMenu(CNTXMN);
 
         var employees = $('#myEmployees').DataTable({
           "ajax" : {
@@ -92,22 +138,23 @@
           ]
         });
 
-        $('#myEmployees tbody').on('click', 'tr', function (e) {
-
-          let aContextMenu = [];
-
-          for (menuElem in CONTEXTMENU) {
-            $('<div>', {'onclick': `CONTEXTMENU[${menuElem}()]`}).append(CONTEXTMENU[menuElem].title)
+        $('body').click(function(e) {
+          if (e.originalEvent.path[0].tagName == 'TD' && e.originalEvent.path[1].id != "") {
+            C.showMenu(e);
+          } else {
+            C.hideMenu();
           }
+        })
 
-          $('<div>', {'class': 'context_menu', css: {
-            'top': e.posY
-            ,'left': e.posX
-          }}).append(aContextMenu).appendTo('body');
-
-        });
       });
-    </script>
+
+      
+/* Menu */
+
+
+/* End Menu */
+
+  </script>
   </head>
   <body>
     <div class="row">
