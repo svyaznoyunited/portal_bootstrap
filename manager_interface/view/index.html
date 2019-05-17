@@ -26,7 +26,7 @@
     <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/bootstrap-select.min.js?<%=ac%>"></script>
     <!-- Other scripts -->
     <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jszip.min.js?<%=ac%>"></script>
-    <script src="//cdn.jsdelivr.net/gh/mar10/jquery-ui-contextmenu@v1/jquery.ui-contextmenu.min.js"></script>
+    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/doms/context_menus.js?<%=ac%>"></script>
 
     <!-- Custom CSS -->
     <style media="screen">
@@ -72,54 +72,38 @@
       const _APPDIR = "http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/manager_interface/";
       const USER = "<%=String(Request.AuthUserID)%>";
 
-      const CNTXMN = [
-        {
-          name: 'action_1'
-          ,title:'Действие 1'
-          ,class: ""
-          ,action: function(a) {
-            alert(a);
-          }
-        }
-      ]
+      let CNTXMN = [];
 
-      class ContextMenu {
-        constructor(a) {
-          this.isActive = false;
-          this.cm_config = a;
-          this.domObject = $('<div>', {id: "context-menu"});
-          for (var i in a) {
-            $('<div>', {id: a[i].name, 'class': `context-menu-element ${a[i].class}`, 'data-params': ''}).append(a[i].title).appendTo(this.domObject);
-          }
-          $(this.domObject).appendTo('body');
-        }
-
-        showMenu(e) {
-          try {
-            if (this.isActive) {
-              this.hideMenu();
+      CNTXMN.push(new contextMenuElement(
+          'alert'
+          ,'Алертнуть'
+          ,function( a ) {
+            for (i in a) {
+              alert(a[i].data);
             }
-            $(this.domObject).css('top', e.pageY);
-            $(this.domObject).css('left', e.pageX);
-            $(this.domObject).slideDown(100);
-            this.isActive = true;
-          } catch (errShowContextMenu) {
-            console.error(errShowContextMenu);
-            this.isActive = false;
           }
-        }
+          ,""
+        )
+      );
 
-        hideMenu(e) {
-          $(this.domObject).slideUp(1);
-          this.isActive = false;
-        }
+      CNTXMN.push(new contextMenuElement(
+          'console'
+          ,'Консольнуть'
+          ,function( a ) {
+            for (i in a) {
+              console.log(a[i].data);
+            }
+          }
+          ,""
+        )
+      );
 
-      }
       $(document).ready(function() {
 
         $('#myEmployees').dataTable().fnDestroy();
 
-        let C = new ContextMenu(CNTXMN);
+        let C = new TableContextMenu(CNTXMN);
+        C.__init__();
 
         var employees = $('#myEmployees').DataTable({
           "ajax" : {
@@ -140,16 +124,7 @@
           ]
         });
 
-        $('body').click(function(e) {
-          if (e.originalEvent.path[0].tagName == 'TD' && e.originalEvent.path[1].id != "") {
-            C.showMenu(e);
-          } else {
-            C.hideMenu();
-          }
-        })
-
       });
-
 
 /* Menu */
 

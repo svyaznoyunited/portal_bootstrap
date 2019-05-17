@@ -1,0 +1,72 @@
+function contextMenuElement(a,b,c,d) {
+	this.name = a;
+	this.title = b;
+	this.method = c;
+	this.class = d;
+}
+
+
+class TableContextMenu {
+        constructor( a ) {
+          this.isActive = false;
+          this.cm_config = a;
+          this.domObject = $('<div>', {id: "context-menu"});
+          this.params = [];
+          for (var i in a) {
+            $('<div>', {id: a[i].name, 'class': `context-menu-element ${a[i].class}`}).append(a[i].title).appendTo(this.domObject);
+          }
+
+        }
+
+        __init__() {
+          let cm_variable = this;
+          $(cm_variable.domObject).appendTo('body');
+
+          $('body').click(function(e) {
+            if (e.originalEvent.path[0].tagName == 'TD' && e.originalEvent.path[1].id != "") {
+              cm_variable.showMenu(e);
+              cm_variable.setParams( { data: e.originalEvent.path[1].id } );
+            } else {
+              cm_variable.hideMenu();
+            }
+
+            if (e.originalEvent.path[0].className.indexOf("context-menu-element") == 0) {
+              cm_variable.callMethod(e.originalEvent.path[0].id);
+            }
+          });
+        }
+
+        showMenu( e ) {
+          try {
+            if (this.isActive) {
+              this.hideMenu();
+            }
+            $(this.domObject).css('top', e.pageY);
+            $(this.domObject).css('left', e.pageX);
+            $(this.domObject).slideDown(100);
+            this.isActive = true;
+          } catch (errShowContextMenu) {
+            console.error(errShowContextMenu);
+            this.isActive = false;
+          }
+        }
+
+        hideMenu() {
+          $(this.domObject).slideUp(1);
+          this.isActive = false;
+        }
+
+        callMethod( methodName ) {
+          for (var f in this.cm_config) {
+            if ( this.cm_config[f].name == methodName ) {
+              return this.cm_config[f].method( this.params );
+            }
+          }
+        }
+
+        setParams( data ) {
+          this.params = [];
+          this.params.push( data );
+        }
+
+      }
