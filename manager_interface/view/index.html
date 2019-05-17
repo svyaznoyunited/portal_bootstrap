@@ -31,7 +31,7 @@
     <!-- Custom CSS -->
     <style media="screen">
       @font-face {font-family: 'SvyaznoySans'; src: url(http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/fonts/SvyaznoySans-Medium.otf);}
-      body {font-family: 'SvyaznoySans'!important; font-weight: 100}
+      body {font-family: 'SvyaznoySans'!important; font-weight: 100;}
       table {width: 100%; margin-top: 2%; text-align: center; border-radius: 10px; border-collapse: separate; border-spacing: 5px; letter-spacing: 2px;}
       table thead tr {color: #ffffff; background: #a770ef;font-size: 16px; font-weight: normal;}
       table thead tr th {text-align: center;}
@@ -42,7 +42,14 @@
       table tbody tr:nth-child(1n) {background: #f6f6f6;}
       table tbody tr:nth-child(2n) {background: #e6e6e6;}
       .sorting_asc, .sorting_desc, .sorting {text-align: center; font-weight: normal; letter-spacing: 3px; font-size: 13px; text-transform: uppercase;}
-
+      #hover-block {
+        width: 30rem;
+        border-radius: 3px;
+        padding: 30px;
+        background-color: #fff;
+        z-index: 999;
+        position: absolute;
+      }
     </style>
 
     <!-- Custom JS -->
@@ -54,12 +61,36 @@
       let CNTXMN = [];
 
       CNTXMN.push(new contextMenuElement(
-          'alert'
-          ,'Алертнуть'
+          'assesment'
+          ,'Оценить по стандарту продаж'
           ,function( a ) {
-            for (i in a) {
-              alert(a[i].data);
-            }
+            $('<div>', {id: 'hover-block', css: {
+
+              'position': 'fixed'
+              ,'top': 0
+              ,'left': 0
+              ,'background-color': 'rgba(0,0,0,0.3)'
+              ,'height' : '100%'
+              ,'width' : '100%'
+              ,'z-index' : 50	
+              }
+              }).append($('<select>', {
+              'class': 'selectpicker'
+              ,'data-live-search': "true"
+              ,'data-width': "100%"
+              ,css: {
+              'position': 'relative'
+              ,'z-index': 51
+              ,'margin': 'auto'
+              }
+              }).append($('<option>', {
+              'selected': true
+              ,'disabled': true
+              ,'value': 0
+              }).append('Выберите из списка'))).appendTo('body');
+
+              let sp_dom = $('.selectpicker').selectpicker();
+              $(sp_dom.offsetParent()[0]).css('top', window.innerHeight/5)
           }
           ,""
         )
@@ -105,10 +136,7 @@
 
       });
 
-/* Menu */
 
-
-/* End Menu */
 
   </script>
   </head>
