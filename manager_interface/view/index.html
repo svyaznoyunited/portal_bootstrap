@@ -73,9 +73,14 @@
       const USER = "<%=String(Request.AuthUserID)%>";
 
       const CNTXMN = [
-        {name: 'action_1', title:'Действие 1', class: ""}
-        ,{name: 'action_2', title:'Действие 2', class: ""}
-        ,{name: 'action_3', title:'Действие 3', class: ""}
+        {
+          name: 'action_1'
+          ,title:'Действие 1'
+          ,class: ""
+          ,action: function(a) {
+            alert(a);
+          }
+        }
       ]
 
       class ContextMenu {
@@ -110,12 +115,11 @@
         }
 
       }
-      let C;
       $(document).ready(function() {
 
         $('#myEmployees').dataTable().fnDestroy();
 
-        C = new ContextMenu(CNTXMN);
+        let C = new ContextMenu(CNTXMN);
 
         var employees = $('#myEmployees').DataTable({
           "ajax" : {
@@ -146,7 +150,7 @@
 
       });
 
-      
+
 /* Menu */
 
 
