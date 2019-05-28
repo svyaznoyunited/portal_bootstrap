@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+    <title>Form</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="app/css/main.css">
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link rel="stylesheet" href="css/mdb.min.css" rel="stylesheet">
+    <!-- JS -->
+    <script type="text/javascript" src="js/jquery-3.4.0.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="js/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="js/mdb.min.js" defer></script>
+    <!-- JQuery -->
+    <script type="text/javascript" src="js/jquery-3.4.0.min.js"></script>
+    <!-- Variables, classes, functions -->
+    <script type="text/javascript" src="app/js/base.js"></script>
+    <script>
+
+      G = {}
+      G.AppUrl = 'http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/evaluation/';
+      G.ApiUrl = G.AppUrl + 'api/';
+      G.object_id = "<%=Request.Query.GetOptProperty('id', '0')%>";
+
+      $(document).ready(function(){
+
+        RC = new FormRows();
+        PopUpHide();
+
+        var W = $('.header').offset().top;
+
+        $(window).scroll(function(){
+            if (W -$(window).scrollTop() < 0) {
+            $('.header').offset().top = 0;
+            $('.header').addClass('fixed')
+          } else {
+            $('.header').offset().top = W;
+            $('.header').removeClass('fixed')
+          }
+        });
+
+        if (G.object_id != '0') {
+          getData(G.object_id, 234);
+        }
+
+      });
+
+      $(document).keyup(function(e) {
+        if (e.keyCode === 27) {
+            $('#popup1').css("display", 'none');
+        }
+    });
+
+      $(document).mouseup(function (e) {
+        var container = $("#popup1");
+        if (container.has(e.target).length === 0){
+            container.hide();
+        }
+    });
+    
+    </script>
+    <style>
+
+    </style>
+</head>
+<body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
+<div class="container">
+  <div class="row">
+    <div class="card" style="margin: 0 auto; margin-top: 15%; width: 70rem;">
+      <h5 class="card-header info-color white-text text-center py-4">
+        <strong>Оценочная форма</strong>
+      </h5>
+      <div class="header">
+        <button class="btn btn-default" onclick="RC.new()"> Добавить </button>
+        <button class="btn btn-secondary center" onclick="RC.save()"> Сохранить </button>
+      </div>
+      <div class="card-body px-lg-5 pt-0">
+        <div class="form-row">
+          <div class="col">
+            <div class="md-form">
+              <input type="text" id="materialRegisterFormFirstName" class="form-control" maxlength="50">
+              <label for="materialRegisterFormFirstName">Название</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row" >
+        <div class="container" id="form_row_data">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="b-popup" id="popup1">
+  <div class="b-popup-content">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12" id="configSetFeilds">
+
+        </div>
+        <div class="col">
+          <button class="btn btn-info" style="margin: 0; float: right;" onclick="PopUpHide()">Ок</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

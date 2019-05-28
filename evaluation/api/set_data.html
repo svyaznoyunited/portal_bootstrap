@@ -1,0 +1,54 @@
+<%
+
+  var data = Request.Query.GetOptProperty('json', 0);
+  var name = Request.Query.GetOptProperty('name', 0);
+  var ID = Request.Query.GetOptProperty('object_id', 0);
+  // var json = tools.read_object(data);
+  // var createdUser = Request.AuthUserID;
+  var createdUser = Request.Query.GetOptProperty('user', 0);
+  var DATA_URL = AppDirectoryPath() + '\\wt\\web\\portal\\bs\\portal_bootstrap\\evaluation\\data\\lists\\'
+
+  function createNewDoc(name, data, createdUser) {
+
+    if ( StrLen(createdUser) < 10 ) {
+      Response.Write(tools.object_to_text({
+        err: true
+        , msg: 'Не авторизованный доступ!'
+      }, 'json'));
+      return false;
+    }
+
+	if ( ID == 0 || ID == "0" ) {
+
+		ID = ArrayOptFirstElem(XQuery('sql: SELECT NEWID() AS ID')).ID;
+
+		PutFileData(DATA_URL + ID + ".json", data)
+
+		var SQL = 'sql: ';
+			SQL += "INSERT INTO wt_flat.dbo.evaluation(id, [name], archived, data_url, creation_date, created_user)\n"
+			SQL += "VALUES (" + SqlLiteral(ID) + ", " + SqlLiteral(name) + ", 0, '/evaluation/data/lists/" + ID + ".json', GETDATE(), " + SqlLiteral(createdUser) + ")";
+
+		ArrayOptFirstElem(XQuery(SQL));
+
+	} else {
+
+		PutFileData(DATA_URL + ID + ".json", data)
+
+		var SQL = 'sql: ';
+			SQL += "UPDATE wt_flat.dbo.evaluation";
+			SQL += " SET modification_date = GETDATE()";
+			SQL += " , modificated_user = " + SqlLiteral(createdUser);
+			SQL += " WHERE id = " + SqlLiteral(StrUpperCase(ID));
+
+		var x = XQuery(SQL);
+
+		ArraySelectAll(x);
+
+
+	}
+	return ID;
+  }
+
+  Response.Write('{"objectId": "' + createNewDoc(name, data, createdUser) + '"}');
+
+%>

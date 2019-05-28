@@ -1,0 +1,77 @@
+<!doctype html>
+<%
+  var SQL = "sql: ";
+      SQL += "SELECT * FROM wt_flat.dbo.evaluation";
+  var X = XQuery(SQL);
+%>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+    <title>Form</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="app/css/main.css">
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link rel="stylesheet" href="css/mdb.min.css" rel="stylesheet">
+    <!-- JS -->
+    <script type="text/javascript" src="js/jquery-3.4.0.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="js/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="js/mdb.min.js" defer></script>
+    <!-- JQuery -->
+    <script type="text/javascript" src="js/jquery-3.4.0.min.js"></script>
+    <!-- Variables, classes, functions -->
+    <script type="text/javascript" src="app/js/base.js"></script>
+    <script>
+
+      G = {}
+      G.AppUrl = 'http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/evaluation/';
+      G.ApiUrl = G.AppUrl + 'api/';
+
+      $(document).ready(function(){
+        $('.link').on('click', function(e){
+          window.open(G.AppUrl+'view/admin/edit.html?id=' + this.id, 'edit', "")
+        });
+      });
+
+    </script>
+    <style>
+
+    </style>
+</head>
+<body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
+<div class="container">
+  <div class="row">
+    <div class="card" style="margin: 0 auto; margin-top: 15%; width: 70rem;">
+      <h5 class="card-header info-color white-text text-center py-4">
+        <strong>Список оценочных форм</strong>
+      </h5>
+      <div class="col-12" id="list">
+<%
+  if ( ArrayCount(X) == 0 ) {
+%>
+      <div class="">
+        Нет записей
+      </div>
+<%
+  } else {
+    for (elem in X) {
+%>
+      <div class="link col-12" id="<%=elem.id%>">
+        <%=elem.name%>
+      </div>
+<%
+    }
+  }
+%>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

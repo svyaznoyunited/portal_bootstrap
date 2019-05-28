@@ -1,0 +1,9 @@
+<%
+  var SQL = "sql: ";
+      SQL += "SELECT id, [name] FROM wt_flat.dbo.evaluation";
+
+  var x = XQuery(SQL);
+
+  Response.Write(tools.object_to_text(x, 'json'));
+
+%>

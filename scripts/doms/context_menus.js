@@ -7,7 +7,7 @@ function contextMenuElement(a,b,c,d) {
 
 
 class TableContextMenu {
-	
+
 	constructor( a ) {
 		this.isActive = false;
 		this.cm_config = a;
@@ -24,8 +24,9 @@ class TableContextMenu {
 	}
 
 	__init__() {
-		let cm_variable = this;
 		
+		let cm_variable = this;
+
 		$('<style>').append(`
 			#context-menu {
 				position: absolute;
@@ -49,24 +50,29 @@ class TableContextMenu {
 				background-color: #cf8bf3;
 			}
 		`).appendTo('body');
-		
+
 		$(cm_variable.domObject).appendTo('body');
 		$('body').click(function(e) {
 			if (
-				e.originalEvent.path[0].tagName == 'TD' 
+				e.originalEvent.path[0].tagName == 'TD'
 				&& e.originalEvent.path[1].id != ""
 			) {
 				cm_variable.showMenu(e);
-				cm_variable.setParams( 
-				{ 
-					data: e.originalEvent.path[1].id 
+				try {
+				cm_variable.setParams(
+				{
+					ID: e.originalEvent.path[1].id
+					,OE: e.originalEvent.path
 				});
+			} catch(errSetParams) {
+				console.error(errSetParams);
+			}
 			} else {
 			  cm_variable.hideMenu();
 			}
-			if ( 
+			if (
 				e.originalEvent.path[0]
-				.className.indexOf("context-menu-element") == 0 
+				.className.indexOf("context-menu-element") == 0
 			) {
 			  cm_variable.callMethod(e.originalEvent.path[0].id);
 			}
