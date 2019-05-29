@@ -37,7 +37,8 @@
 		var SQL = 'sql: ';
 			SQL += "UPDATE wt_flat.dbo.evaluation";
 			SQL += " SET modification_date = GETDATE()";
-			SQL += " , modificated_user = " + SqlLiteral(createdUser);
+      SQL += " , modificated_user = " + SqlLiteral(createdUser);
+			SQL += " , name = " + SqlLiteral(name);
 			SQL += " WHERE id = " + SqlLiteral(StrUpperCase(ID));
 
 		var x = XQuery(SQL);
