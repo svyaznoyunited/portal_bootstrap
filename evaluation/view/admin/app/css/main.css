@@ -91,9 +91,10 @@
   z-index: 999;
   position:fixed;
   top:0px;
+  left: 0%;
 }
 .b-popup .b-popup-content{
-  margin: 15rem auto 0px auto;
+  margin: 20rem auto 0px auto;
   width: 13.5rem;
   z-index: 99;
   padding: 20px;
