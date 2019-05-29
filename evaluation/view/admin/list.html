@@ -1,5 +1,5 @@
 ﻿<%
-  Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html')
+  Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html');
 %>
 <!doctype html>
 <%
@@ -37,7 +37,13 @@
       G = {}
       G.AppUrl = 'http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/evaluation/';
       G.ApiUrl = G.AppUrl + 'api/';
+      G.Host = "<%=DEF_PROTOCOL%><%=HOST%>";
 
+      $(document).ready(function() {
+        $('.link').on('click', function() {
+          window.open(`${G.Host}/view_doc.html?mode=form_edit&id=${this.id}`);
+        })
+      });
     </script>
     <style>
       #list {

@@ -172,7 +172,7 @@
             $("#sheet").append( domTable );
 
             $('#redirect').on('click', function() {
-              window.open(`${window.location.origin}/view_doc.html?mode=list_view&list_id=${list_data.val()}&evaluated=${a[0].ID}`, 'edit', "");
+              window.open(`${window.location.origin}/view_doc.html?mode=form_view&list_id=${list_data.val()}&evaluated=${a[0].ID}`, 'edit', "");
             });
 
             let sp_dom = $('#sheet .selectpicker').selectpicker();
