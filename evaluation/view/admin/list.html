@@ -1,7 +1,13 @@
+﻿<%
+  Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html')
+%>
 <!doctype html>
 <%
   var SQL = "sql: ";
-      SQL += "SELECT * FROM wt_flat.dbo.evaluation";
+      SQL += "SELECT e.name ,e.id ,CONVERT(DATE, e.creation_date, 104) AS creadate ,CONVERT(DATE, e.modification_date, 104) AS moddate ,cs_created.fullname AS creator ,cs_upd.fullname AS modificator ";
+      SQL += "FROM wt_flat.dbo.evaluation e ";
+      SQL += "JOIN collaborators cs_created ON e.created_user = cs_created.id ";
+      SQL += "JOIN collaborators cs_upd ON e.modificated_user = cs_upd.id";
   var X = XQuery(SQL);
 %>
 <html>
@@ -9,66 +15,80 @@
     <meta charset="utf-8">
     <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
     <title>Form</title>
+      <%=init_static([
+      {
+        name: 'jq',
+        v: '340'
+      },{
+        name: 'bs',
+        v: '4'
+      },{
+        name: 'mdb',
+        v: '481'
+      }
+    ]);
+
+    %>
     <!-- Styles -->
-    <link rel="stylesheet" href="app/css/main.css">
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="css/bootstrap.min.css" rel="stylesheet">
-    <!-- Material Design Bootstrap -->
-    <link rel="stylesheet" href="css/mdb.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<%=DEF_PROTOCOL%><%=HOST%>/portal/bs/portal_bootstrap/evaluation/view/user/app/css/main.css">
     <!-- JS -->
-    <script type="text/javascript" src="js/jquery-3.4.0.min.js"></script>
-    <!-- Bootstrap tooltips -->
-    <script type="text/javascript" src="js/popper.min.js"></script>
-    <!-- Bootstrap core JavaScript -->
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="js/mdb.min.js" defer></script>
-    <!-- JQuery -->
-    <script type="text/javascript" src="js/jquery-3.4.0.min.js"></script>
-    <!-- Variables, classes, functions -->
-    <script type="text/javascript" src="app/js/base.js"></script>
     <script>
 
       G = {}
       G.AppUrl = 'http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/evaluation/';
       G.ApiUrl = G.AppUrl + 'api/';
 
-      $(document).ready(function(){
-        $('.link').on('click', function(e){
-          window.open(G.AppUrl+'view/admin/edit.html?id=' + this.id, 'edit', "")
-        });
-      });
-
     </script>
     <style>
-
+      #list {
+        padding: 2rem;
+      }
+      .link {
+        padding: 1rem;
+        margin-top: 1rem;
+        background-color: #9CECFB;
+        color: #333;
+        font-weight: 600;
+        border-radius: .25rem;
+        cursor: pointer;
+        text-align: center;
+      }
+      .headline {
+        margin-top: 1rem;
+        color: lightslategrey;
+        font-weight: 400;
+      }
     </style>
 </head>
 <body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
 <div class="container">
   <div class="row">
-    <div class="card" style="margin: 0 auto; margin-top: 15%; width: 70rem;">
+    <div class="card" style="margin: 0 auto; margin-top: 15%; width: 40rem;">
       <h5 class="card-header info-color white-text text-center py-4">
         <strong>Список оценочных форм</strong>
       </h5>
       <div class="col-12" id="list">
-<%
-  if ( ArrayCount(X) == 0 ) {
-%>
+        <%
+          if ( ArrayCount(X) == 0 ) {
+        %>
       <div class="">
         Нет записей
       </div>
-<%
-  } else {
-    for (elem in X) {
-%>
+        <%
+          } else {
+            for (elem in X) {
+        %>
       <div class="link col-12" id="<%=elem.id%>">
         <%=elem.name%>
+        <div class="col-12 headline">
+          <span>Создал: <%=elem.creator%>, <%=StrLongDate(Date(elem.creadate))%></span>
+          <span>Редактировал: <%=elem.modificator%>, <%=StrLongDate(Date(elem.moddate))%></span>
+        </div>
       </div>
-<%
-    }
-  }
-%>
+        <%
+            }
+          }
+        %>
       </div>
     </div>
   </div>

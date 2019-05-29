@@ -1,5 +1,6 @@
 <%
-  var URL = Request.UrlHost; 
+  var URL = Request.UrlHost;
+  Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html')
 %>
 <!doctype html>
 <html>
@@ -7,12 +8,23 @@
     <meta charset="utf-8">
     <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
     <title>Form</title>
+    <%=init_static([
+			{
+				name: 'jq'
+				,v: '340'
+			},{
+				name: 'bs'
+				,v: '4'
+			},{
+				name: 'mdb'
+				,v: '481'
+			},{
+        name: 'ajm'
+        ,v: '0'
+      }
+		]);%>
     <!-- Styles -->
     <link rel="stylesheet" href="http://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/app/css/main.css">
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="http://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Material Design Bootstrap -->
-    <link rel="stylesheet" href="http://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/css/mdb.min.css" rel="stylesheet">
     <style>
         .switch-input {
             display: none;
@@ -76,18 +88,6 @@
         }
 
     </style>
-    <!-- JS -->
-    <script type="text/javascript" src="http://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/js/jquery-3.4.0.min.js"></script>
-    <!-- Bootstrap tooltips -->
-    <script type="text/javascript" src="http://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/js/popper.min.js"></script>
-    <!-- Bootstrap core JavaScript -->
-    <script type="text/javascript" src="http://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/js/bootstrap.min.js"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="http://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/js/mdb.min.js" defer></script>
-    <!-- JQuery -->
-    <script type="text/javascript" src="http://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/js/jquery-3.4.0.min.js"></script>
-    <!-- Variables, classes, functions -->
-    <script type="text/javascript" src="http://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/app/js/base.js"></script>
     <script>
 
       G = {}
@@ -220,7 +220,7 @@
             $('<span>', {
               'class': ''
               ,css: {
-                
+
                }
             }).append(row.object.name)
             ,assessmentType(row.object.type, row.object.values, row.object.index, row.value)
@@ -305,7 +305,6 @@
       }
 
       function errorGetList() {
-        console.error(arguments);
         $.ajax({
           url: G.AppUrl + 'data/404.json'
           ,async: false
@@ -383,80 +382,5 @@
 </head>
 <body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
   <div id="list_view_content"></div>
-<script>
-  let AJAXLoads = $('<div>', {
-  'id': 'loader_background'
-  ,'onclick': 'function() {return false}'
-  ,css: {
-    'position': 'fixed'
-    ,'z-index': '10000'
-    ,'height' : '100%'
-    , 'width' : '100%'
-    ,'background-color': 'rgba(255,255,255,0.6)'
-    ,'top': '0'
-    ,'left': '0'
-    ,'transition': '300ms linear'
-  }
-}).append([$('<div>', {
-  'id' : 'loader'
-  ,css: {
-    'position': 'relative'
-    ,'border' : '5px solid #f3f3f3'
-    ,'border-radius' : '50%'
-    ,'border-top' : '5px solid #4c1e87'
-    ,'width' : '150px'
-    ,'height' : '150px'
-    ,'-webkit-animation' : 'spin 1s linear infinite'
-    ,'animation' : 'spin 1s linear infinite'
-    ,'z-index': '10001'
-    ,'margin' : 'auto'
-    ,'top' : '40%'
-  }
-}), $('<div>', {
-  'id' : 'err_message'
-  ,css: {
-    'position': 'relative'
-    ,'border' : 'none'
-    ,'width' : 'max-content'
-    ,'height' : 'max-content'
-    ,'z-index': '10001'
-    ,'margin' : 'auto'
-    ,'top' : '40%'
-    ,'color': '#fefefe'
-    ,'display' : 'none'
-  }
-}).append([ $('<span>', {
-  css: {
-    'font-size': ''
-    ,'font-weight': 'bold'
-  }
-}).append('<h5>Произошла ошибка:<h5><br/>')
-  ,$('<span>', {
-    'id': 'err-message-content'
-    , css: {
-      'font-size': ''
-  }}).append('errText')
-])
-  ]);
-
-$(document).ajaxStart(function(){
-  AJAXLoads.appendTo('body');
-  AJAXLoads.css('background-color', 'rgba(255, 0, 0, 0, 0.5)');
-});
-
-$(document).ajaxError(function(event, xhr, settings, error){
-  AJAXLoads.css('background-color', '#ff2400');
-  $('#err-message-content').text(`${settings.url} : ${error}`)
-  $('#loader').fadeOut(300);
-  $('#err_message').fadeIn(300);
-  console.error(event, xhr, settings, error)
-  
-});
-
-$(document).ajaxSuccess(function(event, xhr, settings){
-  AJAXLoads.remove();
-});
-
-</script>
 </body>
 </html>

@@ -1,3 +1,6 @@
+﻿<%
+  Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html')
+%>
 <!doctype html>
 <html>
   <head>
@@ -5,23 +8,25 @@
     <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
     <title>Form</title>
     <!-- Styles -->
-    <link rel="stylesheet" href="app/css/main.css">
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="css/bootstrap.min.css" rel="stylesheet">
-    <!-- Material Design Bootstrap -->
-    <link rel="stylesheet" href="css/mdb.min.css" rel="stylesheet">
-    <!-- JS -->
-    <script type="text/javascript" src="js/jquery-3.4.0.min.js"></script>
-    <!-- Bootstrap tooltips -->
-    <script type="text/javascript" src="js/popper.min.js"></script>
-    <!-- Bootstrap core JavaScript -->
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="js/mdb.min.js" defer></script>
-    <!-- JQuery -->
-    <script type="text/javascript" src="js/jquery-3.4.0.min.js"></script>
+    <%=init_static([
+      {
+        name: 'jq',
+        v: '340'
+      },{
+        name: 'bs',
+        v: '4'
+      },{
+        name: 'mdb',
+        v: '481'
+      },{
+        name: 'ajm'
+        ,v:'0'
+      }
+    ]);
+    %>
+    <link rel="stylesheet" href="<%=DEF_PROTOCOL%><%=HOST%>/portal/bs/portal_bootstrap/evaluation/view/admin/app/css/main.css">
     <!-- Variables, classes, functions -->
-    <script type="text/javascript" src="app/js/base.js"></script>
+    <script type="text/javascript" src="<%=DEF_PROTOCOL%><%=HOST%>/portal/bs/portal_bootstrap/evaluation/view/admin/app/js/base.js"></script>
     <script>
 
       G = {}

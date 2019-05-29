@@ -1,1 +1,0 @@
-{"name":"Privet","array":[{"index":"0","name":"Privet","typeIndex":"1","type":"range","values":{"min":0,"max":10,"step":5}},{"index":"1","name":"Poka","typeIndex":"0","type":"switcher","values":{"min":0,"max":15,"step":null}}]}

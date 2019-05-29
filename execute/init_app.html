@@ -1,0 +1,72 @@
+<%
+var HOST = Request.UrlHost;
+var DEF_PROTOCOL = 'http://';
+
+var STATIC = {
+    'jq': {
+      '340': [
+        '<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/jquery-3.4.0.min.js"></script>'
+      ]
+    }
+	,'jqui': {
+		'1121': [
+			'<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.css">'
+			,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.js"></script>'
+		]
+	}
+    ,'bs': {
+      '4': [
+        '<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/bootstrap/css/bootstrap.min.css">'
+		,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/popper.min.js"></script>'
+        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/bootstrap/js/bootstrap.min.js"></script>'
+      ]
+    }
+    ,'mdb': {
+      '481': [
+        '<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/material-bootstrap/mdb.min.js" rel="stylesheet">'
+        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/material-bootstrap/mdb.min.js"></script>'
+      ]
+    }
+    ,'dt': {
+      '11018': [
+        '<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.css">'
+        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.js"></script>'
+        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/buttons.html5.min.js"></script>'
+        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/dataTables.buttons.min.js"></script>'
+      ]
+    }
+    ,'bss': {
+      '1139': [
+        '<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/animate.css">'
+        ,'<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bs.min.css">'
+        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/bootstrap-select.min.js"></script>'
+      ]
+    }
+	,'ajm': {
+		'0':[
+			'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/ajax-master.js"></script>'
+		]
+	}
+  }
+
+function init_static( array ) {
+
+  var s = "";
+
+  try {
+    for ( x in array ) {
+      for ( y in STATIC[x.name][x.v] ) {
+        s += y;
+      }
+    }
+  } catch (errRenderStatic) {
+    s = "<script> console.error(`Ошибка рендера статических скриптов: " + StrReplace(errRenderStatic, '\\', '/') + "`) </script>";
+  }
+  return s;
+}
+
+function init_info() {
+	Response.Write('console.info(`' + tools.object_to_text(STATIC, 'json') + '`))');
+}
+
+%>
