@@ -1,0 +1,41 @@
+<%
+    Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html');
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Document</title>
+    <%=init_static([
+        {
+            name: 'jq'
+            ,v: '340'
+        },{
+            name: 'jqui'
+            ,v: '1121'
+        },{
+            name: 'bs'
+            ,v: '4'
+        },{
+            name: 'dt'
+            ,v: '11018'
+        },{
+            name: 'bss'
+            ,v: '1139'
+        },{
+            name: 'ajm'
+            ,v: '0'
+        }
+    ]);%>
+
+    - 3 selectpic (торговая точка, должность, город);
+    - кнопка "OK"
+</head>
+<body>
+    <script type="text/javascript">
+        
+    </script>
+</body>
+</html>

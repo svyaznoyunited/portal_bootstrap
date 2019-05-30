@@ -1,4 +1,5 @@
 ﻿<%
+	Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html');
     ac = Random(1,999);
     var SQL = "sql:
 
@@ -21,13 +22,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta charset="utf-8">
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/animate.css">
-    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bootstrap.min.css">
-    <link rel="stylesheet" href="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bs.min.css">
-    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jquery-3.4.0.min.js?<%=ac%>"></script>
-    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/popper.min.js?<%=ac%>"></script>
-    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/js/bootstrap.min.js?<%=ac%>"></script>
-    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/bootstrap-select.min.js?<%=ac%>"></script>
+	<%=init_static([
+		{
+			name: 'jq'
+			,v: '340'
+		},{
+			name: 'bs'
+			,v: '4'
+		},{
+			name: 'bss'
+			,v: '1139'
+		}
+	])%>
     <script>
 
         $(document).ready(function(){
@@ -52,9 +58,9 @@
       });
     </script>
 </head>
-<body>
+<body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
 <div class="row">
-<div class="col-sm-6 col-sm-offset-3">
+<div class="col-sm-6 col-sm-offset-3" style="margin: 2rem auto; padding: 2rem; border-radius: 3px; background-color: #fff">
     <div class="well" style="width: 60%; margin: 0 auto;">
     <form role="form" autocomplete='off' id="contactForm" data-toggle="validator" class="shake">
         <div class="row">
@@ -96,7 +102,7 @@
                 <div class="help-block with-errors"></div>
             </div>
             <div class="form-group col-sm">
-                <i class="fa fa-eye" aria-hidden="true" onkeyup="check();" onclick="myFunction()" style="cursor: pointer; background-color: #fff; padding: 12px; margin: 42px -12px; border: 1px solid #dce4ec; border-radius: 3px;"></i>
+                <i class="fa fa-eye" aria-hidden="true" onkeyup="check();" onclick="myFunction()" style="cursor: pointer; background-color: #fff; padding: 10px; margin: 36px -23px; border: 1px solid #dce4ec; border-radius: 3px;"></i>
             </div>
             <div class="form-group col-sm-12" style="margin-top: -30px;">
                 <label for="date" class="h4">Дата рождения:</label>
@@ -124,10 +130,9 @@
     function check() {
         var pole1 = document.getElementById('firstname'),
             pole2 = document.getElementById('lastname'),
-            pole3 = document.getElementById('middlename'),
             pole4 = document.getElementById('login'),
             pole5 = document.getElementById('password');
-        document.getElementById('submit').disabled = pole1.value && pole2.value && pole3.value && pole4.value && pole5.value ? false : "disabled";
+        document.getElementById('submit').disabled = pole1.value && pole2.value && pole4.value && pole5.value ? false : "disabled";
     $('#submit').click(function() {
         $(':input','#contactForm')
             .not(':button, :submit, :reset, :hidden')

@@ -47,22 +47,27 @@
     </script>
     <style>
       #list {
-        padding: 2rem;
+        padding: 1rem;
       }
       .link {
         padding: 1rem;
-        margin-top: 1rem;
         background-color: #9CECFB;
         color: #333;
         font-weight: 600;
         border-radius: .25rem;
         cursor: pointer;
-        text-align: center;
       }
       .headline {
         margin-top: 1rem;
         color: lightslategrey;
         font-weight: 400;
+      }
+      #link_create {
+        color: #fff;
+      }
+      #btn_create {
+        width: 38rem;
+        margin: 1rem auto;
       }
     </style>
 </head>
@@ -73,7 +78,9 @@
       <h5 class="card-header info-color white-text text-center py-4">
         <strong>Список оценочных форм</strong>
       </h5>
-      <a href="/view_doc.html?mode=form_edit" target="_blank">Создать</a>
+      <button id="btn_create" class="btn btn-default" onclick="window.open('/view_doc.html?mode=form_edit')">
+        Создать
+      </button>
       <div class="col-12" id="list">
         <%
           if ( ArrayCount(X) == 0 ) {
@@ -85,10 +92,10 @@
           } else {
             for (elem in X) {
         %>
-      <div class="link col-12" id="<%=elem.id%>">
+      <div class="link col-12" id="<%=elem.id%>" style="text-align: center">
         <%=elem.name%>
-        <div class="col-12 headline">
-          <span>Создал: <%=elem.creator%>, <%=StrLongDate(Date(elem.creadate))%></span>
+        <div class="col-12 headline" style="text-align: left">
+          <span>Создал: <%=elem.creator%>, <%=StrLongDate(Date(elem.creadate))%></span><br />
           <span>Редактировал: <%=elem.modificator%>, <%=StrLongDate(Date(elem.moddate))%></span>
         </div>
       </div>
