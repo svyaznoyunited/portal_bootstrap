@@ -1,0 +1,51 @@
+﻿<%
+  Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html');
+%>
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Bootstrap core CSS -->
+    <%=init_static( [jq, bs, mdb, ajm] )%>
+    <%=init_globals('/portal/bs/portal_bootstrap/sign/')%>
+    <%=init_local_static({ css: [ 'view/main.css' ] })%>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('#get_login').on('click', function() {
+          $('#login').fadeOut(500, function() {
+            $('#pass').fadeIn(500);
+          });
+
+        })
+      });
+    </script>
+    <title>Sign</title>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <form class="text-center p-5" id='login'>
+                <p class="h4 mb-4 login">Логин</p>
+                <input type="login" class="form-control mb-4" placeholder="Логин">
+                <div class="d-flex justify-content-around">
+                    <div>
+                        <a href="#">Забыли?</a>
+                    </div>
+                </div>
+                <input type="button" value ="Далее"  class="btn btn-info btn-block my-4" id="get_login">
+            </form>
+            <form id='pass' class="text-center p-5">
+              <div id='user_idefier'>И</div>
+              <div id='user_idefier_fullname'>Фамилия Имя Отчество</div>
+              <p class="h4 mb-4 login">Пароль</p>
+              <input type="login" class="form-control mb-4" placeholder="Логин">
+              <input type="button" value ="Войти"  class="btn btn-info btn-block my-4" id="login">
+            </form>
+        </div>
+    </div>
+</body>
+</html>

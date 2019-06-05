@@ -1,0 +1,13 @@
+<%
+  var SQL = "sql: ";
+      SQL += "SELECT CAST(id AS VARCHAR) AS id, [name] ";
+      SQL += "FROM position_commons ";
+      SQL += "WHERE code IN ( ";
+      SQL += "  '00001177' /* Менеджер по продажам финансовых продукт */ ";
+      SQL += "  ,'50000690' /* Менеджер по продажам */ ";
+      SQL += "  ,'50000651' /* Кассир ТТ */ ";
+      SQL += "  ,'00001151' /* Менеджер по продаже финансовых сервисов */ ";
+      SQL += ")";
+  var X = XQuery(SQL);
+  Response.Write(tools.object_to_text(X, 'json'));
+%>

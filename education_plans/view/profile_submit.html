@@ -1,4 +1,4 @@
-<%
+﻿<%
     Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html');
 %>
 <!DOCTYPE html>
@@ -7,35 +7,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>Document</title>
-    <%=init_static([
-        {
-            name: 'jq'
-            ,v: '340'
-        },{
-            name: 'jqui'
-            ,v: '1121'
-        },{
-            name: 'bs'
-            ,v: '4'
-        },{
-            name: 'dt'
-            ,v: '11018'
-        },{
-            name: 'bss'
-            ,v: '1139'
-        },{
-            name: 'ajm'
-            ,v: '0'
-        }
-    ]);%>
+    <title>Профиль</title>
+    <%=init_globals('/portal/bs/portal_bootstrap/education_plans/')%>
+    <%=init_static([ jq, bs, bss, ajm, mdb ])%>
+    <%=init_local_static({js: ['view/js/script.js']})%>
+    <script>
+        let DATA = new Selects();
+        $(document).ready(function(){
+            DATA.new('Город', 'get_citys.html');
+            DATA.new('Торговая точка', 'get_merch_by_city.html');
+            DATA.new('Должность', 'get_positions.html');
+            DATA.new('Тип');
+            DATA.init();
+            DATA.Тип.customOptions([['a', 'Apple'], ['e', 'Евросеть'], ['s', 'Связной']]);
+            DATA.Город.onchange = () => { 
+                DATA.Торговаяточка.httpData = {id: DATA.Город.value}; 
+                DATA.Торговаяточка.reinit();
+            };
+            DATA.initChilds();
 
-    - 3 selectpic (торговая точка, должность, город);
-    - кнопка "OK"
-</head>
-<body>
-    <script type="text/javascript">
-        
+            $('#assign-plan').click(function() {
+                DATA.getQualification();
+            });
+
+        });
     </script>
+</head>
+<body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
+    <div class="container">
+        <div class="row">
+            <div class="card" style="margin: 0 auto; margin-top: 5%; padding: 3rem; width: 40rem; text-align: center;">
+               <div id="selects"></div>
+                <hr width="640" size="1" color="#F0F8FF" style="margin: 3rem -48px;" />
+                <div class="col-sm-12" style="margin-top: 0.7rem;">
+                    <button id="assign-plan" class="btn purple-gradient" style="width: 32rem; font-weight: 800; letter-spacing: 10px; margin-bottom: 1.7rem"><span style="color: #fff">OK</span></button>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

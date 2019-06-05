@@ -1,0 +1,47 @@
+﻿<%
+    var city_id = Request.Query.GetOptProperty('city_id', 0);
+    var merch_id = Request.Query.GetOptProperty('merch_id', 0);
+    var position_id = Request.Query.GetOptProperty('position_id', 0);
+    var type = Request.Query.GetOptProperty('type', 0);
+    var person_id = Request.Query.GetOptProperty('person_id', 0);
+
+    var SQL = "sql: ";
+        SQL += "SELECT DISTINCT ";
+        SQL += "    CAST( pt.data.value('(//qualification_id)[1]', 'BIGINT') AS VARCHAR ) AS qualification_id ";
+        SQL += "FROM cc_prob_type pt ";
+        SQL += "    CROSS APPLY pt.[data].nodes('(//citys/city)') city(s) ";
+        SQL += "    CROSS APPLY pt.[data].nodes('(//common_positions/common_position)') position(p)";
+        SQL += "WHERE city.s.value('city_id[1]', 'BIGINT') = ";
+        SQL += city_id;
+        SQL += "    AND position.p.value('common_position_id[1]', 'BIGINT') = ";
+        SQL += position_id;
+
+    var X = XQuery( SQL );
+
+    if ( ArrayCount(X) == 0 ) {
+        SQL = "sql: ";
+        SQL += "SELECT DISTINCT ";
+        SQL += "    CAST( pt.data.value('(//qualification_id)[1]', 'BIGINT') AS VARCHAR ) AS qualification_id ";
+        SQL += "FROM cc_prob_type pt ";
+        SQL += "    CROSS APPLY pt.[data].nodes('(//common_positions/common_position)') position(p)";
+        SQL += "WHERE pt.data.value('(//remote_training)[1]', 'VARCHAR(5)') = 'true'";
+        SQL += "    AND position.p.value('common_position_id[1]', 'BIGINT') = ";
+        SQL += position_id;
+
+        X =  XQuery( SQL );
+    }
+
+    if ( ArrayCount(X) == 0 || person_id == 0 ) {
+        X = {msg: "Нет доступных квалификаций"};
+        Response.Write( tools.object_to_text( X, 'json' ) );
+        Cancel();
+    }
+
+    var docQualificationAssignment = OpenNewDoc( 'x-local://wtv/wtv_qualification_assignment.xmd' );
+        docQualificationAssignment.TopElem.person_id = person_id;
+        docQualificationAssignment.TopElem.qualification_id = ArrayFirstElem( X ).qualification_id;
+        docQualificationAssignment.BindToDb( DefaultDb );
+        docQualificationAssignment.Save();
+
+    Response.Write( tools.object_to_text( X, 'json' ) );
+%>

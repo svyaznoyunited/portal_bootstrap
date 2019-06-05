@@ -30,14 +30,14 @@
 
     %>
     <!-- Styles -->
-    <link rel="stylesheet" href="<%=DEF_PROTOCOL%><%=HOST%>/portal/bs/portal_bootstrap/evaluation/view/user/app/css/main.css">
+    <link rel="stylesheet" href="<%=__DEF_PROTOCOL__%><%=__HOST__%>/portal/bs/portal_bootstrap/evaluation/view/user/app/css/main.css">
     <!-- JS -->
     <script>
 
       G = {}
       G.AppUrl = 'http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/evaluation/';
       G.ApiUrl = G.AppUrl + 'api/';
-      G.Host = "<%=DEF_PROTOCOL%><%=HOST%>";
+      G.Host = "<%=__DEF_PROTOCOL__%><%=__HOST__%>";
 
       $(document).ready(function() {
         $('.link').on('click', function() {

@@ -1,59 +1,126 @@
 <%
-var HOST = Request.UrlHost;
-var DEF_PROTOCOL = 'http://';
+
+/***
+	init_globals( string )
+		Создаёт в теле документа клиентскую переменную G, 
+		в которой будут ссылки для исполшьзования на вебе и 
+		некоторые другие серверные данные;
+	
+	init_static( array )
+		Подрубает дефолтные библиотеки.
+		В качестве аргументов можно использовть дефолты, либо объекты формата:
+			{
+				name: имя
+				, v: версия
+			}
+		
+	init_local_static( object ) 
+		Подрубает кастомные скрипты\таблицы стилей.
+		На вход объект формата (Не обязательно указывать оба):
+			{
+				css: [
+					'ссылка/один.css'
+					,'ссылка/два.css'
+				]
+				,js: [
+					'ссылка/один.js'
+					,'ссылка/два.js'
+				]
+			}
+***/
+
+var __HOST__ = Request.UrlHost;
+var __DEF_PROTOCOL__ = Request.Url.split('://')[0] + '://';
+var __USER__ = Request.AuthUserID;
+var __APPDIR__ = false;
+
+// ДЕФОЛТНЫ СТАТИКИ
+var jq = { name: 'jq', v: '340' };
+var jqui = { name: 'jqui', v: '1121' };
+var bs = { name: 'bs', v: '4' };
+var mdb = { name: 'mdb', v: '481' };
+var dt = { name: 'dt', v: '11018' };
+var bss = { name: 'bss', v: '1139' };
+var ajm = { name: 'ajm', v: '0' };
+var sa = { name: 'sa', v: '0' };
 
 var STATIC = {
     'jq': {
       '340': [
-        '<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/jquery-3.4.0.min.js"></script>'
+        '<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/jquery-3.4.0.min.js"></script>'
       ]
-    }
-	,'jqui': {
+    },'jqui': {
 		'1121': [
-			'<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.css">'
-			,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.js"></script>'
+			'<link rel="stylesheet" href="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.css">'
+			,'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/jquery-ui-1.12.1/jquery-ui.min.js"></script>'
 		]
-	}
-    ,'bs': {
+	},'bs': {
       '4': [
-        '<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/bootstrap/css/bootstrap.min.css">'
-		    ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/popper.min.js"></script>'
-        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/bootstrap/js/bootstrap.min.js"></script>'
+        '<link rel="stylesheet" href="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/bootstrap/css/bootstrap.min.css">'
+		    ,'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/popper.min.js"></script>'
+        ,'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/bootstrap/js/bootstrap.min.js"></script>'
       ]
-    }
-    ,'mdb': {
+    },'mdb': {
       '481': [
-        '<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/material-bootstrap/mdb.min.css">'
-        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/material-bootstrap/mdb.min.js"></script>'
+        '<link rel="stylesheet" href="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/material-bootstrap/mdb.min.css">'
+        ,'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/material-bootstrap/mdb.min.js"></script>'
       ]
-    }
-    ,'dt': {
+    },'dt': {
       '11018': [
-        '<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.css">'
-        ,'<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/css/buttons.bootstrap.min.css">'
-        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.js"></script>'
-        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/dataTables.buttons.min.js"></script>'
-        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/buttons.html5.min.js"></script>'
+        '<link rel="stylesheet" href="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.css">'
+        ,'<link rel="stylesheet" href="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/css/buttons.bootstrap.min.css">'
+        ,'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/datatables.min.js"></script>'
+        ,'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/dataTables.buttons.min.js"></script>'
+        ,'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/datatable/min.buttons/Buttons-1.5.6/js/buttons.html5.min.js"></script>'
       ]
-    }
-    ,'bss': {
+    },'bss': {
       '1139': [
-        '<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/animate.css">'
-        ,'<link rel="stylesheet" href="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bs.min.css">'
-        ,'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/bootstrap-select.min.js"></script>'
+        '<link rel="stylesheet" href="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/animate.css">'
+        ,'<link rel="stylesheet" href="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/css/bs.min.css">'
+        ,'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/bootstrap/bootstrap-select/bootstrap-select.min.js"></script>'
       ]
-    }
-	,'ajm': {
+    },'ajm': {
 		'0':[
-			'<script type="text/javascript" src="' + DEF_PROTOCOL + HOST + '/portal/bs/portal_bootstrap/scripts/ajax-master.js"></script>'
+			'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/ajax-master.js"></script>'
+		]
+	},'sa': {
+		'0':[
+			'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/smart-array.js"></script>'
 		]
 	}
   }
 
+function init_globals( string )  {
+	__APPDIR__ = __DEF_PROTOCOL__ + __HOST__ + string;
+	var G = {};
+		G.AppPath = __DEF_PROTOCOL__ + __HOST__ + string;
+		G.ApiPath = G.AppPath + 'api/';
+		G.ViewPath = G.AppPath + 'view/';
+		G.User = __USER__;
+	return "<script> G = " + tools.object_to_text(G, 'json') + " </script>";	
+}
+
+function init_local_static( object ) {
+	if ( __APPDIR__ == false ) {
+		return "<script> console.error('Для рендера локальной статики зарегистрируй путь приложения используя метод init_globals( путь/до/корневой/папки/приложения/ )') </script>";
+	}
+	var s = "";
+	if ( object.HasProperty('css') ) {
+		for ( link in object.css ) {
+			s += '<link rel="stylesheet" href="' + __APPDIR__ + link + '">';
+		}
+	}
+	if ( object.HasProperty('js') ) {
+		for ( link in object.js ) {
+			s += '<script type="text/javascript" src="' + __APPDIR__ + link + '"></script>';
+		}
+	}
+	
+	return s;
+}
+
 function init_static( array ) {
-
   var s = "";
-
   try {
     for ( x in array ) {
       for ( y in STATIC[x.name][x.v] ) {
@@ -66,8 +133,5 @@ function init_static( array ) {
   return s;
 }
 
-function init_info() {
-	Response.Write('console.info(`' + tools.object_to_text(STATIC, 'json') + '`))');
-}
 
 %>

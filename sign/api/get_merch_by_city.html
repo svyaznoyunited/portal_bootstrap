@@ -1,0 +1,9 @@
+<%
+  var SQL = "sql: ";
+      SQL += "SELECT CAST(subdivision_id AS VARCHAR) AS id, subdivision_name AS name ";
+      SQL += "FROM subdivision_group_subdivisions ";
+      SQL += "WHERE subdivision_group_id = ";
+      SQL += SqlLiteral(Request.Query.GetOptProperty('id', 0));
+  var X = XQuery(SQL);
+  Response.Write(tools.object_to_text(X, 'json'));
+%>

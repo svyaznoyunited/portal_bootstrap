@@ -40,18 +40,45 @@ let AJAXLoads = $('<div>', {
     ,'display' : 'none'
   }
 }).append([ $('<span>', {
-  css: {
-    'font-size': ''
-    ,'font-weight': 'bold'
-  }
-}).append('<h5>Произошла ошибка:<h5><br/>')
-  ,$('<span>', {
-    'id': 'err-message-content'
-    , css: {
-      'font-size': ''
-  }}).append('errText')
-])
+      css: {
+        'font-size': ''
+        ,'font-weight': 'bold'
+      }
+    }).append('<h5>Произошла ошибка:<h5><br/>')
+      ,$('<span>', {
+        'id': 'err-message-content'
+        , css: {
+          'font-size': ''
+      }}).append('errText')
+    ])
   ]);
+
+$('<style>').append(`
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+		-ms-transform: rotate(0deg);
+		-webkit-transform: rotate(0deg);
+		}
+	100% {
+		transform: rotate(360deg);
+		-ms-transform: rotate(360deg);
+		-webkit-transform: rotate(360deg);
+		}
+	}
+-webkit-@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+		-ms-transform: rotate(0deg);
+		-webkit-transform: rotate(0deg);
+		}
+	100% {
+		transform: rotate(360deg);
+		-ms-transform: rotate(360deg);
+		-webkit-transform: rotate(360deg);
+		}
+	}
+`).appendTo('head');
 
 $(document).ajaxStart(function(){
   AJAXLoads.appendTo('body');

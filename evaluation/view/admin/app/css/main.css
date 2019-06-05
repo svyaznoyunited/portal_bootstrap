@@ -133,28 +133,3 @@
 	animation: spin 0.5s infinite linear;
 	-webkit-animation: spin 0.5s infinite linear;
 	}
-
-@keyframes spin {
-	0% {
-		transform: rotate(0deg);
-		-ms-transform: rotate(0deg);
-		-webkit-transform: rotate(0deg);
-		}
-	100% {
-		transform: rotate(360deg);
-		-ms-transform: rotate(360deg);
-		-webkit-transform: rotate(360deg);
-		}
-	}
--webkit-@keyframes spin {
-	0% {
-		transform: rotate(0deg);
-		-ms-transform: rotate(0deg);
-		-webkit-transform: rotate(0deg);
-		}
-	100% {
-		transform: rotate(360deg);
-		-ms-transform: rotate(360deg);
-		-webkit-transform: rotate(360deg);
-		}
-	}

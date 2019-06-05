@@ -1,0 +1,154 @@
+﻿<%
+    var RR = {};
+    var city_id = Request.Query.GetOptProperty('city_id', 0);
+    var merch_id = Request.Query.GetOptProperty('merch_id', 0);
+    var position_id = Request.Query.GetOptProperty('position_id', 0);
+    var type = Request.Query.GetOptProperty('type', 0);
+    var person_id = Request.Query.GetOptProperty('person_id', 0);
+
+    var SQL = "sql: ";
+        SQL += "SELECT DISTINCT ";
+        SQL += "    CAST( pt.data.value('(//qualification_id)[1]', 'BIGINT') AS VARCHAR ) AS qualification_id ";
+        SQL += "FROM cc_prob_type pt ";
+        SQL += "    CROSS APPLY pt.[data].nodes('(//citys/city)') city(s) ";
+        SQL += "    CROSS APPLY pt.[data].nodes('(//common_positions/common_position)') position(p)";
+        SQL += "WHERE city.s.value('city_id[1]', 'BIGINT') = ";
+        SQL += city_id;
+        SQL += "    AND position.p.value('common_position_id[1]', 'BIGINT') = ";
+        SQL += position_id;
+
+    var X = XQuery( SQL );
+
+    if ( ArrayCount(X) == 0 ) {
+        SQL = "sql: ";
+        SQL += "SELECT DISTINCT ";
+        SQL += "    CAST( pt.data.value('(//qualification_id)[1]', 'BIGINT') AS VARCHAR ) AS qualification_id ";
+        SQL += "FROM cc_prob_type pt ";
+        SQL += "    CROSS APPLY pt.[data].nodes('(//common_positions/common_position)') position(p)";
+        SQL += "WHERE pt.data.value('(//remote_training)[1]', 'VARCHAR(5)') = 'true'";
+        SQL += "    AND position.p.value('common_position_id[1]', 'BIGINT') = ";
+        SQL += position_id;
+
+        X =  XQuery( SQL );
+    }
+
+    RR.first = [ SQL, tools.object_to_text( X, 'json' ) ];
+
+    if ( ArrayCount(X) == 0 || person_id == 0 ) {
+        RR.first.push({msg: "Нет доступных квалификаций"});
+        Response.Write( tools.object_to_text( RR, 'json' ) );
+        Cancel();
+    }
+
+    var docQualificationAssignment = OpenNewDoc( 'x-local://wtv/wtv_qualification_assignment.xmd' );
+        docQualificationAssignment.TopElem.person_id = person_id;
+        docQualificationAssignment.TopElem.qualification_id = ArrayFirstElem( X ).qualification_id;
+        docQualificationAssignment.BindToDb( DefaultDb );
+        docQualificationAssignment.Save();
+
+    function activateCompoundProgramToPerson(vPersonTE, vCompoundProgramID) {
+      RR.third = [];
+        	try {
+        		var PersonID = OptInt(vPersonTE.id, 0);
+        		var CompoundProgramID = OptInt(vCompoundProgramID, 0);
+
+        		if (CompoundProgramID > 0 && PersonID > 0) {
+        			var EventsList = [];
+        			var ThisIsFirstEvent = true;
+        			var CompoundProgramTE = OpenDoc(UrlFromDocID(CompoundProgramID)).TopElem;
+        			var EducationPlanDoc = OpenNewDoc("x-local://wtv/wtv_education_plan.xmd");
+            			EducationPlanDoc.TopElem.AssignElem(CompoundProgramTE);
+            			EducationPlanDoc.TopElem.code = "";
+            			EducationPlanDoc.TopElem.comment = "";
+            			EducationPlanDoc.TopElem.compound_program_id = CompoundProgramID;
+            			EducationPlanDoc.TopElem.person_id = PersonID;
+            			tools.common_filling("collaborator", EducationPlanDoc.TopElem, PersonID, vPersonTE);
+            			EducationPlanDoc.BindToDb(DefaultDb);
+
+        			for (EducationProgram in EducationPlanDoc.TopElem.programs) {
+        				if (!EducationProgram.education_method_id.HasValue) {
+        					EducationProgram.state_id = "2";
+        					continue;
+        				}
+        				EducationMethodTE = OpenDoc(UrlFromDocID(EducationProgram.education_method_id)).TopElem;
+        				switch (EducationMethodTE.type) {
+        					case "course":
+        						EducationProgram.type = "course";
+        						if (EducationMethodTE.course_id != null) {
+        							CourseActivationResult = tools.activate_course_to_person(Int(PersonID), Int(EducationMethodTE.course_id), null, vPersonTE, Int(EducationPlanDoc.DocID));
+        							try {
+        								EducationProgram.active_learning_id = Int(CourseActivationResult.DocID);
+        							}
+        							catch (CourseActivationError) {
+        								EducationProgram.active_learning_id = null;
+        								EducationProgram.state_id = "2";
+        							}
+        						}
+        						if (ThisIsFirstEvent) {
+        							EventsList[EducationProgram.ChildIndex] = null;
+        						}
+        						break;
+        					case "org":
+        						EducationProgram.type = "event";
+        						if (ThisIsFirstEvent) {
+        							EventDoc = OpenNewDoc("x-local://wtv/wtv_event.xmd");
+        							EventDoc.TopElem.type_id = "compound_program_elem";
+        							EventDoc.TopElem.education_method_id = EducationProgram.education_method_id;
+        							EventDoc.TopElem.create_compound_program_id = compoundProgramID;
+        							EventDoc.TopElem.compound_program_id = compoundProgramID;
+        							EventDoc.TopElem.program_id = EducationProgram.PrimaryKey;
+        							tools.common_filling("education_method", EventDoc.TopElem, EducationProgram.education_method_id, null, false);
+        							EventDoc.TopElem.name = EducationProgram.name;
+        							for (FuncManagerElem in Ps.func_managers) {
+        								ChildElem = EventDoc.TopElem.tutors.ObtainChildByKey(FuncManagerElem.PrimaryKey);
+        								ChildElem.AssignElem(FuncManagerElem);
+        							}
+        							EventDoc.TopElem.groups.ObtainChildByKey(Ps.Doc.DocID);
+        							EventDoc.BindToDb(DefaultDb);
+        							EventsList[EducationProgram.ChildIndex] = EventDoc;
+        						} else {
+        							EventDoc = EventsList[EducationProgram.ChildIndex];
+        						}
+
+        						tools.add_person_to_event(Int(PersonID), Int(EventDoc.DocID), vPersonTE, EventDoc, Int(EducationPlanDoc.DocID));
+
+        						EducationProgram.object_id = EventDoc.DocID;
+        						tools.object_filling("event", EducationProgram, EducationProgram.object_id, EventDoc.TopElem, EducationMethodTE);
+        						break;
+        				}
+        			}
+        			EducationPlanDoc.Save();
+              RR.third.push( EducationPlanDoc.DocID );
+        			ThisIsFirstEvent = false;
+        		}
+        	} catch ( ErrorMessage ) {
+            RR.third.push( ErrorMessage );
+          }
+        }
+
+
+    SQL = "sql: ";
+    SQL += "SELECT id, CAST(p.value('(compound_program_id)[1]', 'BIGINT') AS VARCHAR) AS prog_id ";
+    SQL += "FROM qualification ";
+    SQL += "  CROSS APPLY [data].nodes('//compound_programs/compound_program') p(p) "
+    SQL += "WHERE id = ";
+    SQL += ArrayFirstElem( X ).qualification_id;
+
+    X = XQuery( SQL );
+
+    RR.second = [ SQL, tools.object_to_text( X, 'json' ) ];
+
+    if ( ArrayCount( X ) == 0 ) {
+      RR.second.push({msg: "Нет доступных обчений"});
+      Response.Write( tools.object_to_text( RR, 'json' ) );
+      Cancel();
+    }
+
+    var docPerson = OpenDoc(UrlFromDocID(Int( person_id ))).TopElem;
+
+    for ( elem in X ) {
+      activateCompoundProgramToPerson( docPerson, elem.prog_id );
+    }
+
+    Response.Write( tools.object_to_text( RR, 'json' ) );
+%>
