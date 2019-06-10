@@ -1,0 +1,22 @@
+﻿<%
+    var SQL = "sql: ";
+    SQL += "
+    SELECT 
+        es.id AS a
+        ,es.score AS b
+        ,SUBSTRING(CAST( CONVERT( DATE, es.[date], 104 ) AS VARCHAR), 1, 10) AS c
+        ,SUBSTRING(CAST( CONVERT( NVARCHAR, CAST( es.[date] AS TIME ), 108 ) AS VARCHAR), 1, 5) AS d
+        ,cs_evaluated.fullname AS e
+        ,cs_evaluating.fullname AS f
+        ,e.name AS g
+        ,e.id AS h
+        ,CAST( cs_evaluated.id AS VARCHAR ) AS i
+    FROM wt_flat.dbo.evaluations es
+        JOIN collaborators cs_evaluating ON es.evaluating = cs_evaluating.id
+        JOIN collaborators cs_evaluated ON es.evaluated = cs_evaluated.id
+        JOIN wt_flat.dbo.evaluation e ON es.form_id = e.id
+    WHERE es.evaluating = " + SqlLiteral(Request.Query.GetOptProperty('evaluating_id', 0));
+
+    var X = XQuery(SQL);
+    Response.Write(tools.object_to_text( {data: X}, "json" ));
+%>

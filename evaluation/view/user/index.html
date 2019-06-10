@@ -24,7 +24,7 @@
       }
 		]);%>
     <!-- Styles -->
-    <link rel="stylesheet" href="http://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/app/css/main.css">
+    <link rel="stylesheet" href="https://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/app/css/main.css">
     <style>
         .switch-input {
             display: none;
@@ -88,13 +88,11 @@
         }
 
     </style>
+    <%=init_globals("/portal/bs/portal_bootstrap/evaluation/")%>
     <script>
 
-      G = {}
-      G.AppUrl = 'http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/evaluation/';
-      G.ApiUrl = G.AppUrl + 'api/';
       G.base_object_id = "<%=Request.Query.GetOptProperty('list_id', '404')%>";
-      G.base_object_link = G.AppUrl + `data/lists/${ G.base_object_id == '' ? 404 : G.base_object_id }.json`;
+      G.base_object_link = G.AppPath + `data/lists/${ G.base_object_id == '' ? 404 : G.base_object_id }.json`;
       G.object;
       G.evaluation_id = "<%=Request.Query.GetOptProperty('evaluation_id', '0')%>";
       G.user = '<%=Request.AuthUserID%>';
@@ -145,7 +143,7 @@
           this.savedData = data;
 
           $.ajax({
-            url: G.ApiUrl + 'evaluate.html'
+            url: G.ApiPath + 'evaluate.html'
             ,method: "POST"
             ,data: {
               json: JSON.stringify(data)
@@ -180,7 +178,7 @@
         getEvaluation() {
           let controller = this;
           $.ajax({
-            url: G.AppUrl + 'data/evaluations/' + G.evaluation_id + '.json?v='
+            url: G.AppPath + 'data/evaluations/' + G.evaluation_id + '.json?v='
             ,contentType: 'application/json'
             ,dataType: 'json'
             ,success: function(e) {
@@ -306,7 +304,7 @@
 
       function errorGetList() {
         $.ajax({
-          url: G.AppUrl + 'data/404.json'
+          url: G.AppPath + 'data/404.json'
           ,async: false
           ,contentType: 'application/json'
           ,dataType: 'json'

@@ -1,0 +1,302 @@
+﻿<%
+	Request.Execute('\\portal\\bs\\portal_bootstrap\\execute\\init_app.html');
+%>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Результаты мероприятий</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <!-- jQuery -->
+  <%=init_static([
+			{
+				name: 'jq'
+				,v: '340'
+			},{
+				name: 'jqui'
+				,v: '1121'
+			},{
+				name: 'bs'
+				,v: '4'
+			},{
+				name: 'dt'
+				,v: '11018'
+			},{
+				name: 'bss'
+				,v: '1139'
+			},{
+				name: 'ajm'
+				,v: '0'
+			}
+    ]);%>
+    <%=init_globals('/portal/bs/portal_bootstrap/reports/learning_results/')%>
+    <!-- DataTables -->
+    <!-- Other scripts -->
+    <script type="text/javascript" src="https://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jszip.min.js?"></script>
+    <script>
+
+      function getObjects( name ) {
+        $.ajax({
+            url: G.AppPath + 'get_objects.html'
+            ,contentType: 'application/json'
+            ,dataType: 'json'
+            ,data: {
+              mode: name
+            }
+            ,success: function( e ) {
+              for ( i in e ) {
+                $('#' + name).append('<option value="' + e[i].id + '">' + e[i].name + ' ( ' + e[i].code + ' )</option>');
+              }
+              $('#' + name).selectpicker('refresh');
+            }
+          });
+      }
+
+      $(document).ready(function(){
+
+        getObjects( 'course' );
+
+        G.CURRENT_MODE = 'course'
+
+        $('#submit').click(function() {
+          document.getElementById('submit').disabled = true;
+          $("#table").fadeOut(300);
+          getEvents(
+            $('#dateFrom').val()
+            ,$('#dateTo').val()
+          );
+        });
+
+        $('#tests-tab').on('click', function(){
+          getObjects( 'test' );
+          G.CURRENT_MODE = 'test';
+        });
+
+        $('#courses-tab').on('click', function(){
+          G.CURRENT_MODE = 'course';
+        });
+
+        $("#div_table_container").mousemove(function(e) {
+          let a = $('#div_table_container').width()/2;
+          let b = e.pageX;
+          if (a - b > 0) {
+            $("#div_table_container").scrollLeft($("#div_table_container").scrollLeft() -10);
+            $("#div_table_container").css('cursor', 'e-resize');
+          } else if (a - b < 0) {
+            $("#div_table_container").scrollLeft($("#div_table_container").scrollLeft() + 10);
+            $("#div_table_container").css('cursor', 'e-resize');
+          }
+        });
+
+      });
+      $( function() {
+
+        let dateFormat = "dd-mm-yy";
+        let from = $( "#dateFrom" ).datepicker({
+            defaultDate: "+1w",
+            changeMonth: true,
+            changeYear: true,
+            numberOfMonths: 1,
+            dateFormat: "dd-mm-yy"
+          }).on( "change", function() {
+            to.datepicker( "option", "minDate", getDate( this ) );
+          });
+        let to = $( "#dateTo" ).datepicker({
+          defaultDate: "+1w",
+          changeMonth: true,
+          changeYear: true,
+          numberOfMonths: 1,
+          dateFormat: "dd-mm-yy"
+        }).on( "change", function() {
+          from.datepicker( "option", "maxDate", getDate( this ) );
+        });
+
+        function getDate( element ) {
+          let date;
+          try {
+            date = $.datepicker.parseDate( dateFormat, element.value );
+          } catch( error ) {
+            date = null;
+          }
+          return date;
+        }
+      });
+
+      function getEvents( dateFrom, dateTo ) {
+
+        $('#table').dataTable().fnDestroy()
+
+        if ( $('#'+G.CURRENT_MODE).val().length == 0 ||  !dateFrom ) {
+          document.getElementById('submit').disabled = false;
+          return false;
+        }
+
+        $('#table').DataTable({
+            "ajax" : {
+            "url": G.AppPath + 'get_learning_results.html'
+            ,"method" : "POST"
+            ,"data": {
+              "learnings" : $('#'+G.CURRENT_MODE).val().join()
+              ,"from": dateFrom
+              ,"to": dateTo
+              ,"active": $('#activeReq')[0].checked
+              ,'type': G.CURRENT_MODE
+            }
+            //,dataSrc: "data"
+          }
+          ,dom: 'Bfrtip'
+          ,buttons: [{
+                  extend: 'excelHtml5',
+                  title: `${dateFrom} - ${dateTo}`
+              }]
+          ,"columns": [
+            {data: "a"}
+            ,{data: "b"}
+            ,{data: "c"}
+            ,{data: "d"}
+            ,{data: "e"}
+            ,{data: "f"}
+            ,{data: "g"}
+            ,{data: "h"}
+            ,{data: "i"}
+            ,{data: "j"}
+            ,{data: "k"}
+          ]
+        });
+        $("#table").fadeIn(300);
+        document.getElementById('submit').disabled = false;
+      }
+
+  </script>
+  <style>
+    .buttons-excel {
+
+    }
+    #table {display: none;}
+    @font-face {font-family: 'SvyaznoySans'; src: url(https://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/fonts/SvyaznoySans-Medium.otf);}
+    table {width: 100%; margin-top: 2%; text-align: center; border-radius: 10px; border-collapse: separate; border-spacing: 5px; letter-spacing: 2px;}
+    table thead tr {color: #ffffff; background: #a770ef; font-family: 'SvyaznoySans'; font-size: 12px;}
+    table tr td {border-right: 1px solid #dfdfdf;}
+    table tr td:last-child {border-right: 0px;}
+    table tbody tr:nth-child(1n) {background: #f6f6f6;}
+    table tbody tr:nth-child(2n) {background: #e6e6e6;}
+    .cross {cursor: pointer;}
+    .sorting_asc, .sorting {text-align: center; font-weight: normal;}
+    #table_content tr:hover {background: #ffe8e8; transition-duration: 0.6s;}
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}
+    .pulse {display: block;animation: pulse 2s infinite}.pulse:hover {animation: none;}
+    @-webkit-keyframes pulse {0% {-webkit-box-shadow: 0 0 0 0 rgba(204,169,44, 0.4);} 70% {-webkit-box-shadow: 0 0 0 10px #a770ef); } 100% { -webkit-box-shadow: 0 0 0 0 rgba(204,169,44, 0); } }
+    @keyframes pulse { 0% { -moz-box-shadow: 0 0 0 0 rgba(204,169,44, 0.4); box-shadow: 0 0 0 0 rgba(204,169,44, 0.4); } 70% { -moz-box-shadow: 0 0 0 10px rgba(204,169,44, 0); box-shadow: 0 0 0 10px rgba(204,169,44, 0); } 100% { -moz-box-shadow: 0 0 0 0 rgba(248, 248, 248, 0); box-shadow: 0 0 0 0 rgba(204,169,44, 0); } }
+  </style>
+</head>
+<body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
+  <div style="padding: 50px; margin: 5rem 5px; background-color: #fff; border: 10px solid transparent;">
+    <form role="form" autocomplete='off' id="contactForm" data-toggle="validator" class="shake">
+        <div class="row">
+          <div class="form-group col-sm-12">
+            <h3 style="text-transform: uppercase; font-weight: bold; font-family: 'SvyaznoySans', sans-serif; letter-spacing: 7px; text-align: center">Отчет по дистанционному обучению</h3>
+            <div class="form-group col-sm-12">
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link active" id="courses-tab" data-toggle="tab" href="#courses" role="tab" aria-controls="home"
+                    aria-selected="true">Курсы</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="tests-tab" data-toggle="tab" href="#tests" role="tab" aria-controls="profile"
+                    aria-selected="false">Тесты</a>
+                </li>
+              </ul>
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="courses" role="tabpanel" aria-labelledby="home-tab">
+                  <div class="form-group col-sm-12">
+                    <label for="date" class="h5" style="text-transform: uppercase; font-family: 'SvyaznoySans', sans-serif;">Выбери курсы</label>
+                    <select class="selectpicker" data-live-search="true" id="course" data-width="100%" multiple>
+                    </select>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="tests" role="tabpanel" aria-labelledby="profile-tab">
+                  <div class="form-group col-sm-12">
+                    <label for="date" class="h5" style="text-transform: uppercase; font-family: 'SvyaznoySans', sans-serif;">Выбери тесты</label>
+                    <select class="selectpicker" data-live-search="true" id="test" data-width="100%" multiple>
+                    </select>
+                  </div>
+              </div>
+            </div>
+            <div class="form-group col-sm-12">
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="activeReq">
+                <label class="custom-control-label" for="activeReq">Активные</label>
+              </div>
+            </div>
+            <div class="form-group col-sm-6">
+                <label for="dateFrom" class="h5" style="text-transform: uppercase; font-family: 'SvyaznoySans', sans-serif;">Дата с:</label>
+                <input type="text" class="form-control cross" onkeyup="check();" id="dateFrom" placeholder="Дата с">
+            </div>
+            <div class="form-group col-sm-6">
+                <label for="dateTo" class="h5" style="text-transform: uppercase; font-family: 'SvyaznoySans', sans-serif;">По:</label>
+                <input type="text" class="form-control cross" onkeyup="check();" id="dateTo" placeholder="По">
+            </div>
+            <div class="form-group col-sm-12">
+                <button type="button" id="submit" class="btn btn-info btn-m pull-right" style="border: 3px solid #fff; border-radius: 5px;">Сформировать</button>
+            </div>
+            <div class="form-group col-sm-12" ID="div_table_container" style="overflow-x: hidden;">
+                <table class="table" id="table">
+                    <thead>
+                      <tr id="table_head">
+                          <th>Название курсов теста</th>
+                          <th>Имя пользователя</th>
+                          <th>Табель
+                          <th>Подразделение</th>
+                          <th>Должность</th>
+                          <th>Дата приема</th>
+                          <th>Дата увольнения</th>
+                          <th>Активация</th>
+                          <th>Завершение</th>
+                          <th>Баллы</th>
+                          <th>Состояние                          
+                      </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </form>
+    </div>
+    <script>
+
+      function showCurrentDate()  {
+        var d = new Date(),
+        new_value=d.toISOString().slice(0,10);
+        document.getElementById("dateFrom").value=new_value;
+      }
+      showCurrentDate();
+
+      $(function(){
+        var dtToday = new Date();
+
+        var month = dtToday.getMonth() + 1;
+        var day = dtToday.getDate();
+        var year = dtToday.getFullYear();
+        if (month < 10)
+            month = '0' + month.toString();
+        if (day < 10)
+            day = '0' + day.toString();
+
+      $('#dateTo').val(`${day}-${month.length > 1 ? month : '0' + month}-${year}`);
+      $('#dateFrom').val(`${day}-${month.length > 1 ? month : '0' + month}-${year}`);
+
+      function parallax(event) {
+        this.querySelectorAll('.layer').forEach(layer => {
+          layer.style.transform = `translateX(${event.clientX/50}px)`
+        });;
+      }
+
+document.addEventListener('mousemove', parallax);
+
+    });
+
+    </script>
+</body>
+<script type="text/javascript" src="https://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/validator.min.js?<%=ac%>" async='false'></script>
+<script type="text/javascript" src="https://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/form-scripts.js?<%=ac%>" async='false'></script>
+</html>

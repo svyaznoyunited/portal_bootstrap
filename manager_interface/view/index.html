@@ -10,6 +10,7 @@
     <% ac = Random(1,999) %>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <%=init_globals('/portal/bs/tortal_bootstrap/manager_interface/')%>
 		<%=init_static([
 			{
 				name: 'jq'
@@ -29,7 +30,10 @@
 			},{
 				name: 'ajm'
 				,v: '0'
-			}
+			},{
+        name: 'mdb'
+        ,v: '481'
+      }
 		]);%>
     <script type="text/javascript" src="https://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/doms/context_menus.js?<%=ac%>"></script>
     <!-- Custom CSS -->
@@ -46,6 +50,8 @@
       table tbody tr:nth-child(1n) {background: #f6f6f6;}
       table tbody tr:nth-child(2n) {background: #e6e6e6;}
       .sorting_asc, .sorting_desc, .sorting {text-align: center; font-weight: normal; letter-spacing: 3px; font-size: 13px; text-transform: uppercase;}
+      .nav-tabs {border-bottom: none;}
+      .title { background-color: #a770ef; padding: 10px; }
       #close {
         position: absolute;
         margin-left: 30px;
@@ -71,6 +77,9 @@
       #close:after {
         transform: rotate(-45deg);
       }
+      #myEvaluations_name, #myEvaluations_time, #myEvaluations_score  {
+        text-align: center;
+      }
     </style>
 
     <!-- Custom JS -->
@@ -79,12 +88,20 @@
       const USER = "<%=Request.AuthUserID%>";
 
       let CNTXMN = [];
-
+      let CNTXMN_EVALUATIONS = []
+      CNTXMN_EVALUATIONS.push(new contextMenuElement(
+        'redirect'
+        ,'Открыть оценку'
+        ,function( a ) {
+          console.log( a )
+          let o = a[0].ID.split('/');
+          window.open(`${window.location.origin}/view_doc.html?mode=form_view&list_id=${o[1]}&evaluated=${o[2]}&evaluation_id=${o[0]}`); 
+        }
+      ));
       CNTXMN.push(new contextMenuElement(
           'assesment'
           ,'Оценка персонала'
           ,function( a ) {
-            console.log(a);
             $('<div>', {id: 'hover-block', css: {
               'position': 'fixed'
               ,'top': 0
@@ -152,7 +169,6 @@
               ,contentType: 'application/json'
               ,dataType: 'json'
               ,success: function(JSONData) {
-                console.log(JSONData);
                 for (row in JSONData) {
                   let r = JSONData[row];
                   $('#sheet .selectpicker').append($('<option>', { 'value': r.id }).append(r.name));
@@ -164,12 +180,12 @@
             $(domTable).children('.col-sm-2').append($('<button>', {
               'class': 'btn btn-info btn-m pull-right'
               ,'type': 'button'
-              ,'id': 'redirect'
+              ,'id': 'edit_redirect'
             }).append('Оценить'));
 
             $("#sheet").append( domTable );
 
-            $('#redirect').on('click', function() {
+            $('#edit_redirect').on('click', function() {
               window.open(`${window.location.origin}/view_doc.html?mode=form_view&list_id=${list_data.val()}&evaluated=${a[0].ID}`, 'edit', "");
             });
 
@@ -192,23 +208,11 @@
             })
       );
 
-      CNTXMN.push(new contextMenuElement(
-          'console'
-          ,'Консольнуть'
-          ,function( a ) {
-            for (i in a) {
-              console.log(a[i].data);
-            }
-          }
-          ,""
-        )
-      );
-
       $(document).ready(function() {
 
         $('#myEmployees').dataTable().fnDestroy();
 
-        let C = new TableContextMenu(CNTXMN);
+        let C = new TableContextMenu(CNTXMN, 'myEmployees');
         C.__init__();
 
         var employees = $('#myEmployees').DataTable({
@@ -230,24 +234,83 @@
           ]
         });
 
+        $('#profile-tab').click( function(){
+        console.log('a')
+        $('#myEvaluations').dataTable().fnDestroy();
+
+        let C2 = new TableContextMenu(CNTXMN_EVALUATIONS, 'myEvaluations');
+        C2.__init__();
+
+        var evaluations = $('#myEvaluations').DataTable({
+          "ajax" : {
+            "url": _APPDIR + "api/get_evaluations.html"
+            ,"method" : "POST"
+            ,"data": {
+              "evaluating_id" : G.User
+            }
+            ,dataSrc: "data"
+          }
+          ,rowId: 'a'
+          ,dom: 'Bfrtip'
+          ,buttons: []
+          ,"columns": [
+            {data: "e"}
+            ,{data: "g"}
+            ,{data: "b"}
+            ,{data: "c"}
+            ,{data: "d"}
+          ]
+          ,"createdRow": function(row, data, rowIndex) {
+            $(row).attr('id', `${data.a}/${data.h}/${data.i}`);
+          }
+        });
       });
 
+
+      });
   </script>
   </head>
   <body>
     <div class="row">
       <div class="form-group col-sm-12">
-        <table id="myEmployees" class="table">
-          <thead>
-            <tr>
-              <th>ФИО</th>
-              <th>Должность</th>
-              <th>Подразделение</th>
-            </tr>
-          </thead>
-        </table>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home"
+                aria-selected="true">Подчиненные</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
+                aria-selected="false">Оценки</a>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent" style="width: 100%;">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+              <table id="myEmployees">
+                <thead>
+                  <tr>
+                    <th>ФИО</th>
+                    <th>Должность</th>
+                    <th>Подразделение</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <table id="myEvaluations">
+                    <thead>
+                      <tr>
+                        <th>ФИО</th>
+                        <th>Лист</th>
+                        <th>Оценка</th>
+                        <th>Дата</th>
+                        <th>Время</th>
+                      </tr>
+                    </thead>
+                  </table>
+            </div>
+        </div>
       </div>
-    </div>
     <script type="text/javascript">
     </script>
   </body>

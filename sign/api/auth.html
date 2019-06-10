@@ -1,0 +1,35 @@
+﻿<%
+	var mode = Request.Query.GetOptProperty( 'm', 'default' );
+	
+	switch ( mode ) {
+		case 'default':
+			defaultAuth();
+			break;
+		case 'direct':
+			directAuth();
+			break;
+	}
+	
+	function defaultAuth() {
+		var SQL = "sql: ";
+			SQL += "SELECT [data].value('(//password)[1]', 'VARCHAR(max)') AS p ";
+			SQL += ", [data].value('(//login)[1]', 'VARCHAR(max)') AS l ";
+			SQL += "FROM collaborator ";
+			SQL += "WHERE id = ";
+			SQL += SqlLiteral(Request.Query.GetOptProperty('q', 0));
+
+		var X = XQuery(SQL);
+
+		if ( ArrayFirstElem( X ).p == Request.Query.GetOptProperty('z', "qwerty1234ёёё") ) {
+			Request.Session.SetProperty("PlainAuthLogin", ArrayFirstElem( X ).l);
+			Response.Write('{"error": false}');
+		} else {
+			Response.Write('{"error": true}');
+		}
+	}
+	
+	function directAuth() {
+		
+	}
+	
+%>

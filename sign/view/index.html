@@ -15,12 +15,64 @@
     <%=init_local_static({ css: [ 'view/main.css' ] })%>
     <script type="text/javascript">
       $(document).ready(function() {
+        $('form').keydown(function ( event ) {
+          if (event.keyCode == 13) {
+            event.preventDefault();
+            let thisId = $(event.currentTarget[0]).parent()[0].id;
+            if ( thisId == 'login' ) {
+              $('#get_login').trigger('click');
+            } else if ( thisId == 'pass' ) {
+              $('#sign-in').trigger('click');
+            }
+          }
+        });
         $('#get_login').on('click', function() {
-          $('#login').fadeOut(500, function() {
-            $('#pass').fadeIn(500);
-          });
+         $.ajax({
+           url: G.ApiPath + 'get_user_by_login.html'
+           ,contentType: 'application/json'
+           ,dataType: 'json'
+           ,data: {
+             login: $('[type=login]').val()
+           }
+           ,success: function( e ) {
+              if ( e.length == 0 ) {
+                $('.alert-login').show();
+              return false;
+              }
+              G.User = e[0].id;
+              $('#user_idefier').text(e[0].fullname.split(' ')[1][0]);
+              $('#user_idefier_fullname').text(e[0].fullname);
+              $('#user_idefier_position').text(e[0].position_name);
+                $('#login').fadeOut(500, function() {
+                $('#pass').fadeIn(500);
+              });
+            }
+         });
 
-        })
+        });
+
+        $('#sign-in').on('click', function() {
+         $.ajax({
+           url: G.ApiPath + 'auth.html'
+           ,contentType: 'application/json'
+           ,dataType: 'json'
+           ,data: {
+             q: G.User
+             ,z: $('[type=password]').val()
+           }
+           ,success: function( e ) {
+              if (!e.error) {
+                document.location.replace(document.location.origin + '/view_doc.html?mode=home')
+              } else {
+                $('.alert-password').show();
+              }
+            }
+         });
+
+        });
+      });
+      $(function (event) {            
+        $('.alert-login, .alert-password').hide();
       });
     </script>
     <title>Sign</title>
@@ -31,19 +83,35 @@
             <form class="text-center p-5" id='login'>
                 <p class="h4 mb-4 login">Логин</p>
                 <input type="login" class="form-control mb-4" placeholder="Логин">
-                <div class="d-flex justify-content-around">
-                    <div>
-                        <a href="#">Забыли?</a>
-                    </div>
+                <div class="alert alert-login alert-danger" role="alert">
+                  Неправильный логин!
                 </div>
                 <input type="button" value ="Далее"  class="btn btn-info btn-block my-4" id="get_login">
+                <div class="d-flex justify-content-around">
+                    <div class="forgot">
+                        <a href="#">Забыл пароль</a>
+                    </div>
+                </div>
             </form>
             <form id='pass' class="text-center p-5">
               <div id='user_idefier'>И</div>
               <div id='user_idefier_fullname'>Фамилия Имя Отчество</div>
+              <div id='user_idefier_position'>Должность</div>
+              <hr />
               <p class="h4 mb-4 login">Пароль</p>
-              <input type="login" class="form-control mb-4" placeholder="Логин">
-              <input type="button" value ="Войти"  class="btn btn-info btn-block my-4" id="login">
+              <input type="password" class="form-control go-pswd mb-4" placeholder="Пароль">
+              <div class="alert alert-password alert-danger" role="alert">
+                Неправильный пароль!
+              </div>
+              <input type="button" value ="Войти"  class="btn btn-info btn-block my-4" id="sign-in">
+              <div class="d-flex justify-content-around">
+                  <div class="not-me">
+                    <a href="#">Это не я</a>
+                  </div>
+                  <div class="forgot-again">
+                      <a href="#">Забыл пароль</a>
+                  </div>
+              </div>
             </form>
         </div>
     </div>

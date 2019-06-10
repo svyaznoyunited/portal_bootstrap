@@ -1,0 +1,145 @@
+<%
+
+  var learnings = Request.Query.GetProperty( "learnings" );
+  var date_from = SqlLiteral( Request.Query.GetProperty( "from" ) );
+  var date_to = SqlLiteral( Request.Query.GetProperty( "to" ) );
+  var active = Request.Query.GetProperty( "active" );
+  var type = Request.Query.GetProperty( "type" );
+
+  var C_BODY;
+  var AC_BODY;
+  var T_BODY;
+  var AT_BODY;
+
+  function WHERE( array, allias, feild ) {
+
+    var returnWhere = " WHERE " + allias + '.' + feild + ' IN ( ';
+    var isFirst = true;
+
+    for ( elem in array.split(',') ) {
+      returnWhere += isFirst ?  elem : ' ,' + elem;
+      isFirst = false;
+    }
+    returnWhere += ' ) '
+    returnWhere += ' AND CONVERT(DATE, ' + allias + '.last_usage_date, 104) BETWEEN '
+    returnWhere+= "CONVERT(DATE, " + date_from + ", 104)"
+    returnWhere+= " AND CONVERT(DATE, " + date_to + ", 104)"
+
+    return returnWhere;
+
+  }
+
+  C_BODY = "
+    SELECT 
+      ls.course_name 'a'
+      ,cs.fullname 'b'
+      ,c.[data].value( '(//custom_elems/custom_elem[name=''tab_number'']/value)[1]', 'VARCHAR(MAX)' ) 'c'
+      ,cs.position_parent_name 'd'
+      ,cs.position_name 'e'
+      ,cs.hire_date 'f'
+      ,cs.dismiss_date 'g'
+      ,ls.start_learning_date 'h'
+      ,ls.last_usage_date 'i'
+      ,ls.score 'j'
+      ,cls.[name] 'k'
+    FROM learnings ls
+      JOIN collaborators cs ON ls.person_id = cs.id
+      JOIN collaborator c ON cs.id = c.id
+      JOIN [common.learning_states] cls ON ls.state_id = cls.id
+  ";
+
+  AC_BODY = "
+
+    UNION ALL
+
+    SELECT 
+      als.course_name 'a'
+      ,cs.fullname 'b'
+      ,c.[data].value( '(//custom_elems/custom_elem[name=''tab_number'']/value)[1]', 'VARCHAR(MAX)' ) 'c'
+      ,cs.position_parent_name 'd'
+      ,cs.position_name 'e'
+      ,cs.hire_date 'f'
+      ,cs.dismiss_date 'g'
+      ,als.start_learning_date 'h'
+      ,als.last_usage_date 'i'
+      ,als.score 'j'
+      ,cls.[name] 'k'
+    FROM active_learnings als
+      JOIN collaborators cs ON als.person_id = cs.id
+      JOIN collaborator c ON cs.id = c.id
+      JOIN [common.learning_states] cls ON als.state_id = cls.id
+  ";
+
+  T_BODY = "
+    SELECT
+      tls.assessment_name 'a'
+      ,cs.fullname 'b'
+      ,c.[data].value( '(//custom_elems/custom_elem[name=''tab_number'']/value)[1]', 'VARCHAR(MAX)' ) 'c'
+      ,cs.position_parent_name 'd'
+      ,cs.position_name 'e'
+      ,cs.hire_date 'f'
+      ,cs.dismiss_date 'g'
+      ,tls.start_learning_date 'h'
+      ,tls.last_usage_date 'i'
+      ,tls.score 'j'
+      ,cls.[name] 'k'
+    FROM test_learnings tls
+      JOIN collaborators cs ON tls.person_id = cs.id
+      JOIN collaborator c ON cs.id = c.id
+      JOIN [common.learning_states] cls ON tls.state_id = cls.id
+  ";
+
+  AT_BODY = "
+
+    UNION ALL
+
+    SELECT
+      atls.assessment_name 'a'
+      ,cs.fullname 'b'
+      ,c.[data].value( '(//custom_elems/custom_elem[name=''tab_number'']/value)[1]', 'VARCHAR(MAX)' ) 'c'
+      ,cs.position_parent_name 'd'
+      ,cs.position_name 'e'
+      ,cs.hire_date 'f'
+      ,cs.dismiss_date 'g'
+      ,atls.start_learning_date 'h'
+      ,atls.last_usage_date 'i'
+      ,atls.score 'j'
+      ,cls.[name] 'k'
+    FROM active_test_learnings atls
+      JOIN collaborators cs ON atls.person_id = cs.id
+      JOIN collaborator c ON cs.id = c.id
+      JOIN [common.learning_states] cls ON atls.state_id = cls.id
+  ";
+
+
+  var SQL = "sql: ";
+
+  switch  (type ) {
+    case 'course':
+      SQL += C_BODY + WHERE(learnings, 'ls', 'course_id');
+      if ( active ) {
+        SQL += AC_BODY + WHERE(learnings, 'als', 'course_id');
+      }
+      break;
+    case 'test':
+      SQL += T_BODY + WHERE(learnings, 'tls', 'assessment_id');
+      if ( active ) {
+        SQL += AT_BODY + WHERE(learnings, 'atls', 'assessment_id');
+      }
+      break;
+    default:
+      Request.Write('{err: true}');
+      Cancel();
+      break;
+  }
+
+
+  var R = XQuery(SQL);
+
+  var data = {
+     data: R
+    , query: SQL
+  }
+  Response.Write( tools.object_to_text( data, 'json' ) );
+
+%>

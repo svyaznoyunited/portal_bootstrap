@@ -98,15 +98,26 @@ class Selects {
             ,dataType: 'json'
             ,data: {
                 city_id: self.Город.value
+                /*
                 ,merch_id: self.Торговаяточка.value
+                */
                 ,position_id: self.Должность.value
-                ,type: self.Тип.value
-                ,person_id: G.User           
+                ,type: self.Бренд.value
+                ,person_id: G.User
             },success: function( e ) {
-                console.log( e );
-            } 
-            
-        
+                //console.log( e );
+                if (
+                  typeof e.third != 'undefined'
+                  && e.third
+                ) {
+                  alert('Тебе назначен план обучения!');
+                } else {
+                  alert('Для твоей должности не предусмотрен план обучения. Обратись к своему тренеру или наставнику.');
+                }
+                window.location.href = `${window.location.origin}/view_doc.html?mode=home`;
+            }
+
+
         });
     }
 }

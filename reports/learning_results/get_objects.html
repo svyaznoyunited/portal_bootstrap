@@ -1,0 +1,37 @@
+﻿<%
+
+    var SQL = "sql: ";
+
+    switch( Request.Query.GetOptProperty('mode', 0) ) {
+        case 'course':
+            SQL += "
+                SELECT 
+                    CAST( id AS VARCHAR ) AS 'id'
+                    ,[name]
+                    ,code
+                FROM courses
+                    WHERE [name] IS NOT NULL
+            ";
+            break;
+        case 'test':
+            SQL += "
+                SELECT 
+                    CAST( id AS VARCHAR ) AS 'id'
+                    ,title AS 'name'
+                    ,code
+                FROM assessments
+                WHERE title IS NOT NULL
+                    AND title NOT LIKE '%Архив%'
+                    AND title NOT LIKE '%КТЗ%'
+            "
+            break;
+        default:
+            Response.Write('{err: true}');
+            Cancel();
+    }
+
+    var R = XQuery( SQL )
+
+    Response.Write( tools.object_to_text( R, 'json' ) );
+
+%>

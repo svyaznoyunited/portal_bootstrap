@@ -1,5 +1,11 @@
 ﻿<%
+
     Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html');
+    var profileFlag = OpenDoc(UrlFromDocID(Int(__USER__))).TopElem.custom_elems.GetOptChildByKey('anketa_done', 'name');
+
+    if ( profileFlag != undefined && profileFlag == 'true' ) {
+      Request.Redirect("/view_doc.html?mode=home");
+    }
 %>
 <!DOCTYPE html>
 <html>
@@ -9,21 +15,23 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>Профиль</title>
     <%=init_globals('/portal/bs/portal_bootstrap/education_plans/')%>
-    <%=init_static([ jq, bs, bss, ajm, mdb ])%>
+    <%=init_static([ jq, bs, bss, ajm, mdb, sa ])%>
     <%=init_local_static({js: ['view/js/script.js']})%>
     <script>
         let DATA = new Selects();
         $(document).ready(function(){
             DATA.new('Город', 'get_citys.html');
+            /*
             DATA.new('Торговая точка', 'get_merch_by_city.html');
+            */
             DATA.new('Должность', 'get_positions.html');
-            DATA.new('Тип');
+            DATA.new('Бренд');
             DATA.init();
-            DATA.Тип.customOptions([['a', 'Apple'], ['e', 'Евросеть'], ['s', 'Связной']]);
-            DATA.Город.onchange = () => { 
-                DATA.Торговаяточка.httpData = {id: DATA.Город.value}; 
+            DATA.Бренд.customOptions([['AP', 'Apple'], ['ES', 'Евросеть'], ['SV', 'Связной']]);
+            /*DATA.Город.onchange = () => {
+                DATA.Торговаяточка.httpData = {id: DATA.Город.value};
                 DATA.Торговаяточка.reinit();
-            };
+            }; */
             DATA.initChilds();
 
             $('#assign-plan').click(function() {

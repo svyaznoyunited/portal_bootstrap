@@ -1,9 +1,0 @@
-<%
-  var SQL = "sql: ";
-      SQL += "SELECT CAST(id AS VARCHAR) AS id, [name] ";
-      SQL += "FROM subdivision_groups ";
-      SQL += "WHERE code = '#CITY' ";
-      SQL += "ORDER BY [name]";
-  var X = XQuery(SQL);
-  Response.Write(tools.object_to_text(X, 'json'));
-%>

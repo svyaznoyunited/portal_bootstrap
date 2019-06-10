@@ -8,11 +8,12 @@ function contextMenuElement(a,b,c,d) {
 
 class TableContextMenu {
 
-	constructor( a ) {
+	constructor( a, target ) {
 		this.isActive = false;
 		this.cm_config = a;
 		this.domObject = $('<div>', {id: "context-menu"});
 		this.params = [];
+		this.target = target;
 		for (var i in a) {
 			$('<div>', {
 				id: a[i].name
@@ -52,10 +53,12 @@ class TableContextMenu {
 		`).appendTo('body');
 
 		$(cm_variable.domObject).appendTo('body');
+
 		$('body').click(function(e) {
 			if (
 				e.originalEvent.path[0].tagName == 'TD'
 				&& e.originalEvent.path[1].id != ""
+				&& e.originalEvent.path[3].id == cm_variable.target
 			) {
 				cm_variable.showMenu(e);
 				try {

@@ -7,27 +7,61 @@
     var person_id = Request.Query.GetOptProperty('person_id', 0);
 
     var SQL = "sql: ";
-        SQL += "SELECT DISTINCT ";
+        SQL += "WITH q(id) AS (";
+        SQL += "  SELECT DISTINCT ";
         SQL += "    CAST( pt.data.value('(//qualification_id)[1]', 'BIGINT') AS VARCHAR ) AS qualification_id ";
-        SQL += "FROM cc_prob_type pt ";
+        SQL += "  FROM cc_prob_type pt ";
         SQL += "    CROSS APPLY pt.[data].nodes('(//citys/city)') city(s) ";
-        SQL += "    CROSS APPLY pt.[data].nodes('(//common_positions/common_position)') position(p)";
-        SQL += "WHERE city.s.value('city_id[1]', 'BIGINT') = ";
+        SQL += "    CROSS APPLY pt.[data].nodes('(//common_positions/common_position)') position(p) ";
+        SQL += "  WHERE city.s.value('city_id[1]', 'BIGINT') = ";
         SQL += city_id;
-        SQL += "    AND position.p.value('common_position_id[1]', 'BIGINT') = ";
+        SQL += "      AND position.p.value('common_position_id[1]', 'BIGINT') = ";
         SQL += position_id;
+        SQL += ") ";
+        SQL += "SELECT qs.id AS qualification_id ";
+        SQL += "FROM q ";
+        SQL += "	JOIN qualifications qs ON q.id = qs.id ";
+        SQL += "WHERE qs.code = ";
+        SQL += SqlLiteral( type );
+
 
     var X = XQuery( SQL );
 
     if ( ArrayCount(X) == 0 ) {
         SQL = "sql: ";
-        SQL += "SELECT DISTINCT ";
+        SQL += "WITH q(id) AS (";
+        SQL += "  SELECT DISTINCT ";
         SQL += "    CAST( pt.data.value('(//qualification_id)[1]', 'BIGINT') AS VARCHAR ) AS qualification_id ";
-        SQL += "FROM cc_prob_type pt ";
-        SQL += "    CROSS APPLY pt.[data].nodes('(//common_positions/common_position)') position(p)";
-        SQL += "WHERE pt.data.value('(//remote_training)[1]', 'VARCHAR(5)') = 'true'";
-        SQL += "    AND position.p.value('common_position_id[1]', 'BIGINT') = ";
+        SQL += "  FROM cc_prob_type pt ";
+        SQL += "    CROSS APPLY pt.[data].nodes('(//common_positions/common_position)') position(p) ";
+        SQL += "  WHERE pt.data.value('(//remote_training)[1]', 'VARCHAR(5)') = 'true' ";
+        SQL += "      AND position.p.value('common_position_id[1]', 'BIGINT') = ";
         SQL += position_id;
+        SQL += ") ";
+        SQL += "SELECT qs.id AS qualification_id ";
+        SQL += "FROM q ";
+        SQL += "	JOIN qualifications qs ON q.id = qs.id ";
+        SQL += "WHERE qs.code = ";
+        SQL += SqlLiteral( type );
+
+        X =  XQuery( SQL );
+    }
+
+    if ( ArrayCount(X) == 0 ) {
+        SQL = "sql: ";
+        SQL += "WITH q(id) AS (";
+        SQL += "  SELECT DISTINCT ";
+        SQL += "    CAST( pt.data.value('(//qualification_id)[1]', 'BIGINT') AS VARCHAR ) AS qualification_id ";
+        SQL += "  FROM cc_prob_type pt ";
+        SQL += "    CROSS APPLY pt.[data].nodes('(//common_positions/common_position)') position(p) ";
+        SQL += "  WHERE position.p.value('common_position_id[1]', 'BIGINT') = ";
+        SQL += position_id;
+        SQL += ") ";
+        SQL += "SELECT qs.id AS qualification_id ";
+        SQL += "FROM q ";
+        SQL += "	JOIN qualifications qs ON q.id = qs.id ";
+        SQL += "WHERE qs.code = ";
+        SQL += SqlLiteral( type );
 
         X =  XQuery( SQL );
     }
@@ -61,7 +95,8 @@
             			EducationPlanDoc.TopElem.code = "";
             			EducationPlanDoc.TopElem.comment = "";
             			EducationPlanDoc.TopElem.compound_program_id = CompoundProgramID;
-            			EducationPlanDoc.TopElem.person_id = PersonID;
+                  EducationPlanDoc.TopElem.person_id = PersonID;
+            			EducationPlanDoc.TopElem.comment = 'Создано автоматически через анкету';
             			tools.common_filling("collaborator", EducationPlanDoc.TopElem, PersonID, vPersonTE);
             			EducationPlanDoc.BindToDb(DefaultDb);
 
@@ -120,6 +155,7 @@
         			EducationPlanDoc.Save();
               RR.third.push( EducationPlanDoc.DocID );
         			ThisIsFirstEvent = false;
+
         		}
         	} catch ( ErrorMessage ) {
             RR.third.push( ErrorMessage );
@@ -144,11 +180,20 @@
       Cancel();
     }
 
-    var docPerson = OpenDoc(UrlFromDocID(Int( person_id ))).TopElem;
+    var docPerson = OpenDoc(UrlFromDocID(Int( person_id )));
 
     for ( elem in X ) {
-      activateCompoundProgramToPerson( docPerson, elem.prog_id );
+      activateCompoundProgramToPerson( docPerson.TopElem, elem.prog_id );
     }
+
+    var profileFlag = docPerson.TopElem.custom_elems.GetOptChildByKey('anketa_done', 'name');
+    if ( profileFlag == undefined ) {
+      profileFlag = docPerson.TopElem.custom_elems.AddChild();
+      profileFlag.name  = 'anketa_done';
+    }
+    profileFlag.value = true;
+
+    docPerson.Save();
 
     Response.Write( tools.object_to_text( RR, 'json' ) );
 %>

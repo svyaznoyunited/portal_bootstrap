@@ -1,0 +1,12 @@
+<%
+  var SQL = "sql: ";
+      SQL += "SELECT CAST( id AS VARCHAR) AS id, fullname, position_name ";
+      SQL += "FROM collaborators "
+      SQL += "WHERE login = ";
+      SQL += SqlLiteral( Request.Query.GetOptProperty( 'login', 0 ) );
+
+  var X = XQuery( SQL );
+
+  Response.Write( tools.object_to_text( X, 'json' ) );
+
+%>
