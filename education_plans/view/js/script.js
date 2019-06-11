@@ -38,6 +38,7 @@
             ,dataType: 'json'
             ,data: this.httpData
             ,success: function(e) {
+				console.log( e )
                 $(self.DOM.children()[1].children[0]).children('select').html("<option selected disabled>Выберите из списка</option>");
                 for (let elem in e) {
                     $(self.DOM.children()[1].children[0]).children('select').append($('<option>', {
