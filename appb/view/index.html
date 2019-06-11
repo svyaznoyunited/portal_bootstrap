@@ -1,0 +1,45 @@
+<%
+  Request.Execute("/portal/bs/portal_bootstrap/execute/init_app.html");
+  var __DIR__ = AppDirectoryPath() + '/wt/web/portal/bs/portal_bootstrap/appb/data/';
+  var __PORTALDIR__ = AppDirectoryPath() + '/wt/web/portal/bs/portal_bootstrap/';
+  var __TEMPLATEPATH__ = '/portal/bs/portal_bootstrap/';
+
+  var fn = {};
+  fn.init_static = function a(args) {
+    return init_static( args )
+  }
+
+  var name = Request.Query.GetOptProperty('name', 0);
+  var buildPath = Request.Query.GetOptProperty('buildpath', 0);
+  var is_new = !FilePathExists( __DIR__ + name + '.html' );
+
+  function init( name ) {
+    var HTML = '<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+  </body>
+</html>
+    ';
+    PutFileData( __DIR__ + name + '.html', HTML);
+  }
+
+  function build( path, name ) {
+    var DATA = LoadFileData( __DIR__ + name + '.html' );
+    Response.Write( DATA )
+    PutFileData( __PORTALDIR__ + StrReplace( path , '.', '/') + '/' + name + '.html', DATA);
+  }
+
+  if ( is_new ) {
+    init( name );
+  } else {
+    if ( buildPath != 0 ){
+      build( buildPath, name );
+    }
+  }
+
+%>

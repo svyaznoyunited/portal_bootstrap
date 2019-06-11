@@ -1,0 +1,4 @@
+<%
+  var name = Request.Query.GetOptProperty('app_name', 0);
+  Response.Write( FilePathExists('portal/bs/portal_bootstrap/appb/data/appManager.html') )
+%>

@@ -1,3 +1,121 @@
+class FormRow {
+
+  constructor(configTypes) {
+    this.name = "";
+    this.type = 999;
+    this.config = "";
+    this.configObj = null;
+    this.index = null;
+    this.domObj = null;
+    this.configTypes = configTypes;
+  }
+
+  nameSet() {
+    this.name = $('#row_'+this.index+'_name').val();
+  }
+
+  typeSet(type=null) {
+    if ( type == null ) {
+      this.type = $('#row_'+this.index+'_type').val();
+    } else {
+      this.type = type;
+      $('#row_'+this.index+'_type').val(type);
+    }
+    this.configObj = new RC.configTypes[this.type].constructor(this.index);
+    this.configObj.__initDOM__()
+  }
+
+  configSet(paramName, value) {
+    let iValue = parseInt(value);
+    this.configObj[paramName] = iValue;
+    this.configObj.__initDOM__();
+  }
+
+  __init__() {
+
+    this.domObj = $('<div>', {
+      'class': 'row'
+      ,css: {
+        'margin': '1rem'
+      }
+    }).append('<div>', {
+      'class': 'col-3'
+    }).append('<div>', {
+      'class': 'md-form'
+    });
+
+    $(this.domObj).append([
+      $('<div>', {
+        'class': 'col-6'
+      }).append([
+        $('<input>', {
+          'onkeyup': `RC.aRows[${this.index}].nameSet()`
+          ,'type': 'text'
+          ,'class': 'form-control'
+          ,'id': `row_${this.index}_name`
+          ,'maxlength': '300'
+        }).val(this.name)
+        ,$('<label>', {
+          'for': `row_${this.index}_name`
+        })
+      ]),
+      ,$('<div>', {
+        'class': 'col-3'
+      }).append([
+        $('<select>', {
+          'onchange': `RC.aRows[${this.index}].typeSet()`
+          ,'id': `row_${this.index}_type`
+          ,'class': 'form-control'
+        }).append(this.configTypesDom()).val(this.type)
+      ])
+      ,$('<div>', {
+        'class': 'col-2'
+      }).append([
+        $('<button>', {
+          'class': 'setting-button form-control btn btn-info'
+          ,'onclick': 'javascript:PopUpShow('+this.index+')'
+          ,css: {
+            'margin': '3px'
+          , 'padding': '0'
+          }
+        }).append('Настроить')
+      ])
+      ,$('<div>', {
+        'class': 'col'
+      }).append([
+        $('<span>', {
+          'class': 'close'
+          ,'onclick': `RC.remove(${this.index})`
+        })
+      ])
+    ]).appendTo("#form_row_data");
+  }
+
+  configTypesDom() {
+    let returnDOM = []
+
+    returnDOM.push(
+      $('<option>', {
+        'class': 'mdb-select md-form'
+        ,'selected': true
+        ,'disabled': true
+        ,'value': 999
+      }).append('Выберите тип оценки')
+    );
+
+    for (let elem in this.configTypes) {
+      returnDOM.push(
+        $('<option>', {
+          'value': elem
+        }).append(this.configTypes[elem].name)
+      );
+    }
+
+    return returnDOM;
+  }
+
+}
+
 class FormRows {
   constructor() {
     this.aRows = [];
@@ -160,127 +278,7 @@ class FormRows {
   }
 }
 
-class FormRow {
-
-  constructor(configTypes) {
-    this.name = "";
-    this.type = 999;
-    this.config = "";
-    this.configObj = null;
-    this.index = null;
-    this.domObj = null;
-    this.configTypes = configTypes;
-  }
-
-  nameSet() {
-    this.name = $('#row_'+this.index+'_name').val();
-  }
-
-  typeSet(type=null) {
-    if ( type == null ) {
-      this.type = $('#row_'+this.index+'_type').val();
-    } else {
-      this.type = type;
-      $('#row_'+this.index+'_type').val(type);
-    }
-    this.configObj = new RC.configTypes[this.type].constructor(this.index);
-    this.configObj.__initDOM__()
-  }
-
-  configSet(paramName, value) {
-    let iValue = parseInt(value);
-    this.configObj[paramName] = iValue;
-    this.configObj.__initDOM__();
-  }
-
-  __init__() {
-
-    this.domObj = $('<div>', {
-      'class': 'row'
-      ,css: {
-        'margin': '1rem'
-      }
-    }).append('<div>', {
-      'class': 'col-3'
-    }).append('<div>', {
-      'class': 'md-form'
-    });
-
-    $(this.domObj).append([
-      $('<div>', {
-        'class': 'col-6'
-      }).append([
-        $('<input>', {
-          'onkeyup': `RC.aRows[${this.index}].nameSet()`
-          ,'type': 'text'
-          ,'class': 'form-control'
-          ,'id': `row_${this.index}_name`
-          ,'maxlength': '300'
-        }).val(this.name)
-        ,$('<label>', {
-          'for': `row_${this.index}_name`
-        })
-      ]),
-      ,$('<div>', {
-        'class': 'col-3'
-      }).append([
-        $('<select>', {
-          'onchange': `RC.aRows[${this.index}].typeSet()`
-          ,'id': `row_${this.index}_type`
-          ,'class': 'form-control'
-        }).append(this.configTypesDom()).val(this.type)
-      ])
-      ,$('<div>', {
-        'class': 'col-2'
-      }).append([
-        $('<button>', {
-          'class': 'setting-button form-control btn btn-info'
-          ,'onclick': 'javascript:PopUpShow('+this.index+')'
-          ,css: {
-            'margin': '3px'
-          , 'padding': '0'
-          }
-        }).append('Настроить')
-      ])
-      ,$('<div>', {
-        'class': 'col'
-      }).append([
-        $('<span>', {
-          'class': 'close'
-          ,'onclick': `RC.remove(${this.index})`
-        })
-      ])
-    ]).appendTo("#form_row_data");
-  }
-
-  configTypesDom() {
-    let returnDOM = []
-
-    returnDOM.push(
-      $('<option>', {
-        'class': 'mdb-select md-form'
-        ,'selected': true
-        ,'disabled': true
-        ,'value': 999
-      }).append('Выберите тип оценки')
-    );
-
-    for (let elem in this.configTypes) {
-      returnDOM.push(
-        $('<option>', {
-          'value': elem
-        }).append(this.configTypes[elem].name)
-      );
-    }
-
-    return returnDOM;
-  }
-
-}
-
 let RC;
-
-
 
 function PopUpShow(index){
   $('#configSetFeilds').html('');
