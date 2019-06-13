@@ -23,44 +23,51 @@ class SmartArray {
 		return context;
 	}
 
-	find( a, b, c='=' ) {
+	find( searchObject ) {
+		
 		let result = [];
+		
+		let a = searchObject.path ? searchObject.path : '/val';
+		let b = searchObject.val ? searchObject.val : false;
+		let c = searchObject.operand ? searchObject.operand : '=';
+		let d = searchObject.return ? searchObject.return : 'a';
+		
 		for ( let i in this.data ){
 			switch( c ) {
                 case '=':
 					if ( this.xPath( i + a ) === b ) {
-						result.push( this.a[i] );
+						result.push( this[d][i] );
 					}
 					break;
                 case '!=':
 					if ( this.xPath( i + a ) !== b ) {
-						result.push( this.a[i] );
+						result.push( this[d][i] );
 					}
 					break;
                 case '<':
 					if ( this.xPath( i + a ) < b ) {
-						result.push( this.a[i] );
+						result.push( this[d][i] );
 					}
 					break;
                 case '>':
 					if ( this.xPath( i + a ) > b ) {
-						result.push( this.a[i] );
+						result.push( this[d][i] );
 					}
 					break;
                 case '<=':
 					if ( this.xPath( i + a ) <= b ) {
-						result.push( this.a[i] );
+						result.push( this[d][i] );
 					}
 					break;
                 case '>=':
 					if ( this.xPath( i + a ) >= b ) {
-						result.push( this.a[i] );
+						result.push( this[d][i] );
 					}
 					break;
 				case '~':
 					try {
 						if ( this.xPath( i + a ).indexOf( b ) != -1 ) {
-							result.push( this.a[i] );
+							result.push( this[d][i] );
 						}
 					} catch (errGetStr) {
 						console.error( errGetStr );
@@ -78,7 +85,6 @@ class SmartArray {
 		try {
 			return parent[child];
 		} catch (errGetChild) {
-			//console.error(errGetChild);
 			return null;
 		}
 	}
@@ -98,7 +104,6 @@ class SmartArray {
 			
 			break;
 		}
-		console.info( result )
 		return result;
 	}
 }

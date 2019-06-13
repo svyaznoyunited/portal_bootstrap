@@ -1,6 +1,52 @@
 ﻿<%
 	var mode = Request.Query.GetOptProperty( 'm', 'default' );
-	
+
+	function defaultAuth() {
+		var SQL = "sql: ";
+			SQL += "SELECT [data].value('(//password)[1]', 'VARCHAR(max)') AS pw ";
+			SQL += ", [data].value('(//login)[1]', 'VARCHAR(max)') AS lg ";
+			SQL += "FROM collaborator ";
+			SQL += "WHERE id = ";
+			SQL += SqlLiteral(Request.Query.GetOptProperty('id', 0));
+
+		var X = XQuery(SQL);
+
+		if ( ArrayFirstElem( X ).pw == unmix( Request.Query.GetOptProperty( 'data', undefined ) ) ) {
+			Request.Session.SetProperty("PlainAuthLogin", ArrayFirstElem( X ).lg);
+			Response.Write('{"error": false}');
+		} else {
+			Response.Write('{"error": true}');
+		}
+	}
+
+	function directAuth() {
+
+	}
+
+
+	function unmix( string ) {
+		var token = Request.Query.GetOptProperty( 'token', 0 );
+		var SQL = "sql: "
+				SQL += "SELECT [key] AS data, separator AS mark ";
+				SQL += "FROM wt_flat.dbo.auth ";
+				SQL += "WHERE id = ";
+				SQL += SqlLiteral( token );
+
+		var R = ArrayOptFirstElem( XQuery( SQL ), {} );
+		var list = [];
+		var I = 0;
+		while (I != StrLen(R.data)) {
+			list.push(String(R.data).charAt(I));
+			I++;
+		}
+		var aString = string.split( R.mark );
+		var res = [];
+		for (ch in aString) {
+			res.push( list[Int(ch)] );
+		}
+		return res.join('');
+	}
+
 	switch ( mode ) {
 		case 'default':
 			defaultAuth();
@@ -9,27 +55,5 @@
 			directAuth();
 			break;
 	}
-	
-	function defaultAuth() {
-		var SQL = "sql: ";
-			SQL += "SELECT [data].value('(//password)[1]', 'VARCHAR(max)') AS p ";
-			SQL += ", [data].value('(//login)[1]', 'VARCHAR(max)') AS l ";
-			SQL += "FROM collaborator ";
-			SQL += "WHERE id = ";
-			SQL += SqlLiteral(Request.Query.GetOptProperty('q', 0));
 
-		var X = XQuery(SQL);
-
-		if ( ArrayFirstElem( X ).p == Request.Query.GetOptProperty('z', "qwerty1234ёёё") ) {
-			Request.Session.SetProperty("PlainAuthLogin", ArrayFirstElem( X ).l);
-			Response.Write('{"error": false}');
-		} else {
-			Response.Write('{"error": true}');
-		}
-	}
-	
-	function directAuth() {
-		
-	}
-	
 %>

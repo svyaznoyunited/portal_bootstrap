@@ -1,0 +1,14 @@
+<%
+  var SQL = "sql:
+    SELECT TOP 1
+      id AS token
+      ,[key] AS [data]
+      ,separator AS mark
+    FROM wt_flat.dbo.auth
+    ORDER BY valid_date DESC
+  ";
+
+  var R = XQuery( SQL );
+
+  Response.Write( tools.object_to_text( ArrayOptFirstElem( R ), 'json' ) );
+%>

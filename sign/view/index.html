@@ -10,7 +10,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
     <!-- Bootstrap core CSS -->
-    <%=init_static( [jq, bs, mdb, ajm] )%>
+    <%=init_static( [jq, bs, mdb, ajm, au, sa] )%>
     <%=init_globals('/portal/bs/portal_bootstrap/sign/')%>
     <%=init_local_static({ css: [ 'view/main.css' ] })%>
     <script type="text/javascript">
@@ -52,13 +52,16 @@
         });
 
         $('#sign-in').on('click', function() {
+          let data = mix( $('[type=password]').val() );
          $.ajax({
            url: G.ApiPath + 'auth.html'
            ,contentType: 'application/json'
            ,dataType: 'json'
+           ,async: false
            ,data: {
-             q: G.User
-             ,z: $('[type=password]').val()
+             id: G.User
+             ,data: data
+             ,token: G.token
            }
            ,success: function( e ) {
               if (!e.error) {
@@ -71,7 +74,7 @@
 
         });
       });
-      $(function (event) {            
+      $(function (event) {
         $('.alert-login, .alert-password').hide();
       });
     </script>
