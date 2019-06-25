@@ -7,23 +7,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
     <title>Form</title>
-    <!-- Styles -->
-    <%=init_static([
-      {
-        name: 'jq',
-        v: '340'
-      },{
-        name: 'bs',
-        v: '4'
-      },{
-        name: 'mdb',
-        v: '481'
-      },{
-        name: 'ajm'
-        ,v:'0'
-      }
-    ]);
-    %>
+    <%=init_static( [ jq, bs, mdb, ajm ] )%>
     <link rel="stylesheet" href="<%=__DEF_PROTOCOL__%><%=__HOST__%>/portal/bs/portal_bootstrap/evaluation/view/admin/app/css/main.css">
     <!-- Variables, classes, functions -->
     <script type="text/javascript" src="<%=__DEF_PROTOCOL__%><%=__HOST__%>/portal/bs/portal_bootstrap/evaluation/view/admin/app/js/base.js"></script>
@@ -101,19 +85,6 @@
   </div>
 </div>
 <div class="container">
-  <div class="row">
-    <div class="card" style="margin: 0 auto; margin-top: 5%; width: 50rem;">
-      <h5 class="card-header info-color white-text text-center py-4">
-        <strong>Оценочная форма</strong>
-      </h5>
-      <div class="form-row">
-        <div class="col">
-          <div class="md-form">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 <div class="b-popup" id="popup1">
   <div class="b-popup-content">

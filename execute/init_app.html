@@ -134,6 +134,7 @@ function init_static( array ) {
     }
   } catch (errRenderStatic) {
     s = "<script> console.error(`Ошибка рендера статических скриптов: " + StrReplace(errRenderStatic, '\\', '/') + "`) </script>";
+    s += "<script> console.error(`Входной массив: " + tools.object_to_text( array, 'json' ) + "`) </script>";
   }
   return s;
 }

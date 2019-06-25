@@ -8,21 +8,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
     <title>Form</title>
-    <%=init_static([
-			{
-				name: 'jq'
-				,v: '340'
-			},{
-				name: 'bs'
-				,v: '4'
-			},{
-				name: 'mdb'
-				,v: '481'
-			},{
-        name: 'ajm'
-        ,v: '0'
-      }
-		]);%>
+    <%init_static([ jq, bs, mdb, ajm ])%>
     <!-- Styles -->
     <link rel="stylesheet" href="https://<%=URL%>/portal/bs/portal_bootstrap/evaluation/view/user/app/css/main.css">
     <style>
@@ -245,25 +231,26 @@
 
       function assessmentType(string, values, index, val=null) {
         let DOM;
-        switch (string){
+        let SubDOM;
+        switch (string) {
           case 'switcher':
             DOM = $('<div>', { });
-            DOM.append( [
-              $('<input>', {
+            DOM.append( $('<input>', {
                 'type': 'checkbox'
                 ,'id': 'row_' + index
                 ,'class': 'switch-input'
                 ,'data-off': values.min
                 ,'data-on': values.max
-              })
-              ,$('<label>', {
+              }));
+              SubDOM = DOM.append( $('<label>', {
                 'for': 'row_' + index
                 ,'class': 'switch-label'
-              }).append([
+              }));
+              SubDOM.append([
                 $('<span>', {'class': 'toggle--on'}).append(values.max)
                 ,$('<span>', {'class': 'toggle--off'}).append(values.min)
               ])
-            ])
+              
             break;
           case 'range':
             DOM = $('<div>', {
@@ -271,7 +258,7 @@
               ,css: { 'padding-top': '0.8rem' }
             });
 
-            DOM.append([
+            DOM.append(
             $('<div>', {
               'class': 'col-10'
             }).append($('<input>', {
@@ -283,8 +270,9 @@
               ,'max': values.max
               ,'step': values.step
               ,'oninput': `$('#label_range_row_${index}').text($('#row_${index}').val())`
-            }).val(values.min))
-            ,$('<div>', {
+            }).val(values.min)))
+
+            DOM.append($('<div>', {
               'class': 'col-2'
             }).append($('<span>', {
               css: {
@@ -293,8 +281,10 @@
               }
               ,'id': 'label_range_row_' + index
             }).append(val == null ? values.min : val))
-            ]);
+            );
             break;
+          case 'header':
+            DOM = $('<span>');
           default:
             DOM = $('<font>', { 'color': 'red' } ).append('err');
           break;
@@ -317,7 +307,6 @@
       $(document).ready(function(){
 
         G.controller = new Evaluation(G.evaluation_id);
-
         $.ajax({
           url: G.base_object_link + '?ac=' + new Date().getMilliseconds()
           ,async: false
@@ -344,7 +333,7 @@
             ,'border-radius': '.25rem'
           }
         }).append(
-          $('<div>', { 'class': 'row' }).append([
+          $('<div>', { 'class': 'row' }).append(
             $('<div>', {
               'class': 'col-12'
               ,css: { 'text-align' : 'center' }
@@ -356,7 +345,7 @@
                 }
               }).append(G.object.name)
             )
-          ])
+          )
         ).appendTo('#list_view_content');
 
         for (elem in G.object.array) {

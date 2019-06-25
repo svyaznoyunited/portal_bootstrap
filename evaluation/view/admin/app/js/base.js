@@ -213,6 +213,24 @@ class FormRows {
 
         }
       }
+      ,{
+        name: 'Заголовок'
+        ,constructor: class Switcher {
+          constructor( rowIndex ) {
+            this.type = 'header';
+            this.min = null;
+            this.max = null;
+            this.rowIndex = rowIndex;
+            this.domObj = [];
+          }
+
+          __initDOM__() {
+            this.domObj = [
+            ]
+          }
+
+        }
+      }
     ]
   }
 
