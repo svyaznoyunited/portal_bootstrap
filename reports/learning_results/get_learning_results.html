@@ -6,6 +6,14 @@
   var active = Request.Query.GetProperty( "active" );
   var type = Request.Query.GetProperty( "type" );
 
+  var MANAGERS = "WITH managers(id, fullname) AS (
+    SELECT ss.id, fms.person_fullname
+    FROM subdivisions ss
+      JOIN func_managers fms ON ss.parent_object_id = fms.[object_id]
+    WHERE ss.org_id = 6678975295790676989
+      AND parent_object_id IS NOT NULL
+  )"
+
   var C_BODY;
   var AC_BODY;
   var T_BODY;
@@ -36,9 +44,9 @@
       ,c.[data].value( '(//custom_elems/custom_elem[name=''tab_number'']/value)[1]', 'VARCHAR(MAX)' ) 'c'
       ,cs.position_parent_name 'd'
       ,cs.position_name 'e'
-      ,cs.hire_date 'f'
-      ,cs.dismiss_date 'g'
-      ,ls.start_learning_date 'h'
+      ,ls.start_learning_date 'f'
+      ,ms.fullname 'g'
+      ,s.[data].value( '(//custom_elems/custom_elem[name=''tt_code'']/value)[1]', 'varchar(10)' ) 'h'
       ,ls.last_usage_date 'i'
       ,ls.score 'j'
       ,cls.[name] 'k'
@@ -46,6 +54,8 @@
       JOIN collaborators cs ON ls.person_id = cs.id
       JOIN collaborator c ON cs.id = c.id
       JOIN [common.learning_states] cls ON ls.state_id = cls.id
+      LEFT JOIN managers ms ON cs.position_parent_id = ms.id
+      JOIN subdivision s ON cs.position_parent_id = s.id
   ";
 
   AC_BODY = "
@@ -58,9 +68,9 @@
       ,c.[data].value( '(//custom_elems/custom_elem[name=''tab_number'']/value)[1]', 'VARCHAR(MAX)' ) 'c'
       ,cs.position_parent_name 'd'
       ,cs.position_name 'e'
-      ,cs.hire_date 'f'
-      ,cs.dismiss_date 'g'
-      ,als.start_learning_date 'h'
+      ,als.start_learning_date 'f'
+      ,ms.fullname 'g'
+      ,s.[data].value( '(//custom_elems/custom_elem[name=''tt_code'']/value)[1]', 'varchar(10)' ) 'h'
       ,als.last_usage_date 'i'
       ,als.score 'j'
       ,cls.[name] 'k'
@@ -68,6 +78,8 @@
       JOIN collaborators cs ON als.person_id = cs.id
       JOIN collaborator c ON cs.id = c.id
       JOIN [common.learning_states] cls ON als.state_id = cls.id
+      LEFT JOIN managers ms ON cs.position_parent_id = ms.id
+      JOIN subdivision s ON cs.position_parent_id = s.id
   ";
 
   T_BODY = "
@@ -77,9 +89,9 @@
       ,c.[data].value( '(//custom_elems/custom_elem[name=''tab_number'']/value)[1]', 'VARCHAR(MAX)' ) 'c'
       ,cs.position_parent_name 'd'
       ,cs.position_name 'e'
-      ,cs.hire_date 'f'
-      ,cs.dismiss_date 'g'
-      ,tls.start_learning_date 'h'
+      ,tls.start_learning_date 'f'
+      ,ms.fullname 'g'
+      ,s.[data].value( '(//custom_elems/custom_elem[name=''tt_code'']/value)[1]', 'varchar(10)' ) 'h'
       ,tls.last_usage_date 'i'
       ,tls.score 'j'
       ,cls.[name] 'k'
@@ -87,6 +99,8 @@
       JOIN collaborators cs ON tls.person_id = cs.id
       JOIN collaborator c ON cs.id = c.id
       JOIN [common.learning_states] cls ON tls.state_id = cls.id
+      LEFT JOIN managers ms ON cs.position_parent_id = ms.id
+      JOIN subdivision s ON cs.position_parent_id = s.id
   ";
 
   AT_BODY = "
@@ -99,9 +113,9 @@
       ,c.[data].value( '(//custom_elems/custom_elem[name=''tab_number'']/value)[1]', 'VARCHAR(MAX)' ) 'c'
       ,cs.position_parent_name 'd'
       ,cs.position_name 'e'
-      ,cs.hire_date 'f'
-      ,cs.dismiss_date 'g'
-      ,atls.start_learning_date 'h'
+      ,atls.start_learning_date 'f'
+      ,ms.fullname 'g'
+      ,s.[data].value( '(//custom_elems/custom_elem[name=''tt_code'']/value)[1]', 'varchar(10)' ) 'h'
       ,atls.last_usage_date 'i'
       ,atls.score 'j'
       ,cls.[name] 'k'
@@ -109,6 +123,8 @@
       JOIN collaborators cs ON atls.person_id = cs.id
       JOIN collaborator c ON cs.id = c.id
       JOIN [common.learning_states] cls ON atls.state_id = cls.id
+      LEFT JOIN managers ms ON cs.position_parent_id = ms.id
+      JOIN subdivision s ON cs.position_parent_id = s.id
   ";
 
 
@@ -116,13 +132,13 @@
 
   switch  (type ) {
     case 'course':
-      SQL += C_BODY + WHERE(learnings, 'ls', 'course_id');
+      SQL += MANAGERS +C_BODY + WHERE(learnings, 'ls', 'course_id');
       if ( active ) {
         SQL += AC_BODY + WHERE(learnings, 'als', 'course_id');
       }
       break;
     case 'test':
-      SQL += T_BODY + WHERE(learnings, 'tls', 'assessment_id');
+      SQL += MANAGERS + T_BODY + WHERE(learnings, 'tls', 'assessment_id');
       if ( active ) {
         SQL += AT_BODY + WHERE(learnings, 'atls', 'assessment_id');
       }

@@ -148,17 +148,21 @@
           ,dom: 'Bfrtip'
           ,buttons: [{
                   extend: 'excelHtml5',
-                  title: `${dateFrom} - ${dateTo}`
+                  //title: `${dateFrom} - ${dateTo}`,
+				  title: ( function () { return prompt('Название для выгружаемого отчёта', `${dateFrom} - ${dateTo}` ) })(),
+				  customize: function( xl ) {
+					  console.log( xl )
+				  }
               }]
           ,"columns": [
             {data: "a"}
             ,{data: "b"}
             ,{data: "c"}
             ,{data: "d"}
-            ,{data: "e"}
-            ,{data: "f"}
-            ,{data: "g"}
             ,{data: "h"}
+            ,{data: "e"}
+            ,{data: "g"}
+            ,{data: "f"}
             ,{data: "i"}
             ,{data: "j"}
             ,{data: "k"}
@@ -209,18 +213,24 @@
               </ul>
               <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="courses" role="tabpanel" aria-labelledby="home-tab">
-                  <div class="form-group col-sm-12">
+                  <div class="form-group col-sm-9">
                     <label for="date" class="h5" style="text-transform: uppercase; font-family: 'SvyaznoySans', sans-serif;">Выбери курсы</label>
                     <select class="selectpicker" data-live-search="true" id="course" data-width="100%" multiple>
                     </select>
                   </div>
+				  <div class="form-group col-sm-3">
+					<button type="button" class="btn btn-danger btn-m " onclick="$('#course').val('default');$('#course').selectpicker('refresh');" style="border: 3px solid #fff; border-radius: 7px;">Сбросить</button>
+				</div>
                 </div>
                 <div class="tab-pane fade" id="tests" role="tabpanel" aria-labelledby="profile-tab">
-                  <div class="form-group col-sm-12">
+                  <div class="form-group col-sm-9">
                     <label for="date" class="h5" style="text-transform: uppercase; font-family: 'SvyaznoySans', sans-serif;">Выбери тесты</label>
                     <select class="selectpicker" data-live-search="true" id="test" data-width="100%" multiple>
                     </select>
                   </div>
+				  <div class="form-group col-sm-3">
+					<button type="button" class="btn btn-danger btn-m " onclick="$('#test').val('default');$('#test').selectpicker('refresh');" style="border: 3px solid #fff; border-radius: 7px;">Сбросить</button>
+				</div>
               </div>
             </div>
             <div class="form-group col-sm-12">
@@ -246,17 +256,17 @@
                 <table class="table" id="table">
                     <thead>
                       <tr id="table_head">
-                          <th>Название курсов теста</th>
+                          <th>Название</th>
                           <th>Имя пользователя</th>
-                          <th>Табель
+                          <th>Табель</th>
                           <th>Подразделение</th>
+                          <th>Код ТТ</th>
                           <th>Должность</th>
-                          <th>Дата приема</th>
-                          <th>Дата увольнения</th>
+                          <th>ТД</th>
                           <th>Активация</th>
                           <th>Завершение</th>
                           <th>Баллы</th>
-                          <th>Состояние                          
+                          <th>Состояние</th>                   
                       </tr>
                     </thead>
                 </table>
