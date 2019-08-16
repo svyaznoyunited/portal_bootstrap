@@ -1,0 +1,240 @@
+﻿<%
+	Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html');
+%>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<%=init_static([ jq, bs, mdb, ajm, bss])%>
+    <script>
+        const TAGS = {
+             div: '<div>'
+            ,input: '<input>'
+            ,label: '<label>'
+            ,button: '<button>'
+            ,select: '<select>'
+            ,span: '<span>'
+        }
+        const CLASSES = {
+             md2: 'col-md-2 mb-2'
+            ,md3: 'col-md-3 mb-3'
+            ,md4: 'col-md-4 mb-4'
+            ,md6: 'col-md-6 mb-6'
+            ,row: 'row'
+            ,close: 'close'
+            ,card: 'card'
+            ,cardPeach: 'card card-cascade peach-gradient'
+            ,cardBody: 'card-body'
+            ,spr: 'selectpicker'
+            ,mdf: 'md-form form-sm'
+            ,fcl: 'form-control'
+            ,btnp: 'btn btn-primary'
+            ,btns: 'btn btn-secondary'
+            ,btnss: 'btn btn-success'
+            ,btnd: 'btn btn-danger'
+            ,btnw: 'btn btn-warning'
+            ,btnw: 'btn btn-info'
+        }
+
+        function InputTextInstance( dataField, labelText ) {
+            return [
+                dataField
+                ,$( TAGS.label, { 'for': dataField[0].id, 'text': labelText } )
+            ]
+        }
+
+        function SelectPickerInstance( id, value ) {
+			return $( TAGS.span, { 'id': id,'class': CLASSES.span, 'data-live-search': 'true', 'data-width': '100%', 'value': value } );
+        }
+        
+        function DelBtnInstance() {
+			let delBtn = $( TAGS.button, { 'class': CLASSES.close, 'text': '✖', css: { 'position': 'absolute', 'right': '1rem', 'top': '1rem','z-index': '10000' } } );
+			delBtn[0].onmouseenter = function() {
+				$(this).parent().addClass( 'del-danger' );
+			}
+			delBtn[0].onmouseleave = function() {
+				$(this).parent().removeClass( 'del-danger' );
+			}
+				return delBtn;
+        }
+        
+        function Learning( obj, parent ) {
+			this.parent = parent;
+			this.index = parent.learnings.length;
+
+            this.id = obj.id;
+            this.step_id = obj.step_id;
+            this.education_id = obj.education_id;
+            this.education_type = obj.education_type;
+            this.access = obj.access;
+
+            this.dataFields = {};
+
+            this.dataFields.edu_id = SelectPickerInstance( 'plan-step-learning-id', this.education_id );
+            this.dataFields.edu_type = SelectPickerInstance( 'plan-step-learning-type', this.education_type );
+            this.dataFields.access = SelectPickerInstance( 'plan-step-learning-access', this.access );
+
+            this.dataFields.btn_remove = DelBtnInstance();
+
+            this.template = $( TAGS.div, { 'class': CLASSES.card, css: { 'margin-bottom' : '1rem', 'transition' : '0.3s linear' } } ).append([
+                this.dataFields.btn_remove
+                ,$( TAGS.div, { 'class': CLASSES.cardBody } ).append([
+                    $( TAGS.div, { 'class':  CLASSES.row, 'style': 'margin: 0 auto' } ).append([
+                        $( TAGS.div, { 'class':  CLASSES.md4 } ).append(
+                            $( TAGS.div, { 'class': CLASSES.mdf } ).append( this.dataFields.edu_id )
+                        )
+                        ,$( TAGS.div, { 'class':  CLASSES.md4 } ).append(
+                            $( h.div, { 'class': CLASSES.mdf } ).append( this.dataFields.edu_type )
+                        )
+                        ,$( h.div, { 'class':  CLASSES.md4 } ).append(
+                            $( h.div, { 'class': CLASSES.mdf } ).append( this.dataFields.access )
+                        )
+                    ])
+                ])
+            ]);
+
+            this.instance = function() {
+                console.log( this.template[0], this.parent.dataFields.child_container[0] )
+                this.template.appendTo( this.parent.dataFields.child_container );
+                this.dataFields.edu_id.selectpicker('refresh');
+                this.dataFields.edu_type.selectpicker('refresh');
+                this.dataFields.access.selectpicker('refresh');
+            }
+        }
+
+        function Model ( obj={} ) {
+            let self = this;
+
+            this.id = obj.id;
+            this.name = obj.name;
+            this.access = obj.access;
+            this.steps = [];
+			this.dataFields = {};
+
+            this.dataFields.name = $( TAGS.input, { 'type': 'text', 'class': CLASSES.fcl, 'id': 'plan-name', 'value': this.name } );
+
+            this.dataFields.child_container = $(TAGS.div, { class: 'container' });
+
+            this.dataFields.btn_add_step = $( TAGS.button, { 'class': CLASSES.btns, 'text': 'Добавить этап' } );
+            this.dataFields.btn_add_step[0].onclick = function() {
+                self.addStep();
+            }
+
+            this.template = $( TAGS.div, { 'class':  CLASSES.cardPeach, css: { 'width': '50%', 'height': '50%', 'padding': '5rem', 'margin': '0 auto' } } ).append([
+                $( TAGS.div, { 'class':  CLASSES.row } ).append([
+                    $( TAGS.div, { 'class':  CLASSES.md6 } ).append(
+                        $( TAGS.div, { 'class': CLASSES.mdf } ).append(
+                            InputTextInstance( this.dataFields.name, 'Название' )
+                        )
+                    )
+                    ,$( TAGS.div, { 'class':  CLASSES.md6 } ).append(
+                        $( TAGS.div, { 'class': CLASSES.mdf, css: { 'float': 'right' } } ).append( this.dataFields.btn_add_step )
+                    )
+                ])
+            ]);
+            this.instance = function( target ) {
+                this.template.appendTo( target );
+                this.dataFields.child_container.appendTo( target );
+                this.updateView();
+            }
+            this.updateView = function() {
+                for ( s in this.steps ) {
+                    this.steps[ s ].instance();
+                }
+            }
+            this.addStep = function( obj={} ) {
+                this.steps.push( new Step( obj, this ) );
+                this.updateView();
+            }
+            for ( step in obj.steps ) {
+                this.addStep( obj.steps[step] );
+            }
+        }
+        
+        $(document).ready(function(){
+        });
+
+        function Step( obj, parent ) {
+            let self = this;
+
+			this.index = parent.steps.length;
+            this.parent = parent;
+
+            this.id = obj.id;
+            this.plan_id = obj.plan_id;
+            this.name = obj.name;
+            this.access = obj.access;
+            this.learnings = [];
+			this.dataFields = {};
+
+            this.dataFields.name = $( TAGS.input, { 'type': 'text', 'class': CLASSES.fcl, 'id': 'plan-step-name', 'value': this.name } );
+            this.dataFields.access = SelectPickerInstance( 'plan-access', this.access );
+
+			this.dataFields.child_container = $(TAGS.div, { 'class': 'container' });
+
+			this.dataFields.btn_remove = DelBtnInstance();
+			this.dataFields.btn_remove[0].onclick = function() {
+				$( this ).parent().remove();
+				self.parent.removeStep();
+			}
+            this.dataFields.btn_add_learning = $( TAGS.button, { 'class': CLASSES.btnp, 'text': 'Добавить обучение' } );
+            this.dataFields.btn_add_learning[0].onclick = function() {
+                self.addLearning();
+            }
+
+			this.template = $( TAGS.d, { 'class': CLASSES.card, css:{ 'margin-bottom' : '1rem', 'transition' : '0.3s linear' } } ).append([
+			    ,this.dataFields.btn_remove
+					,$( TAGS.div, { 'class': CLASSES.cardBody } ).append([
+						$( TAGS.div, { 'class':  CLASSES.row, 'style': 'margin: 0 auto' } ).append([
+							$( TAGS.div, { 'class':  CLASSES.md4 } ).append(
+								$( TAGS.div, { 'class': CLASSES.mdf } ).append( InputTextInstance( this.dataFields.name, 'Название этапа' ) )
+							)
+							,$( TAGS.div, { 'class':  CLASSES.md4 } ).append(
+								$( TAGS.div, { 'class': CLASSES.mdf } ).append( this.dataFields.access )
+							)
+							,$( TAGS.div, { 'class':  CLASSES.md4 } ).append(
+								$( TAGS.div, { 'class': CLASSES.mdf } ).append( this.dataFields.btn_add_learning )
+							)
+						])
+						,this.dataFields.child_container
+					])
+			]);
+
+            this.addLearning = function( obj={} ) {
+                this.learnings.push( new Learning( obj, this ) )
+                this.updateView()
+            }
+            this.instance = function() {
+                this.template.appendTo( this.parent.dataFields.child_container );
+								this.dataFields.access.selectpicker('refresh');
+                this.updateView()
+            }
+            this.updateView = function() {
+                for ( l in this.learnings ) {
+                    this.learnings[ l ].instance();
+                }
+            }
+
+            for ( learning in obj.learnings ) {
+                this.addLearning( obj.learnings[learning], this );
+            }
+        }
+
+        var MODEL;
+        $(document).ready(function(){
+            MODEL = new Model({});
+            MODEL.instance( '#ModelInstance' );
+        });
+
+    </script>
+</head>
+<body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
+    <div class="card">
+        <div id='ModelInstance' class="card-body">
+        </div>
+      </div>
+</body>
+</html>
