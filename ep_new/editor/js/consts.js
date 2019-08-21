@@ -8,6 +8,9 @@ const h = {
     ,sn: '<span>'
     ,o: '<option>'
     ,p: '<p>'
+    ,ul: '<ul>'
+    ,li: '<li>'
+    ,a: '<a>'
 }
 const c = {
      md2: 'col-md-2 mb-2'
@@ -17,6 +20,7 @@ const c = {
     ,close: 'close'
     ,card: 'card'
     ,fontBolder: 'font-weight-bolder'
+    ,navTabs: 'nav nav-tabs'
     ,cardBody: 'card-body'
     ,spr: 'selectpicker'
     ,mdf: 'md-form form-sm'
