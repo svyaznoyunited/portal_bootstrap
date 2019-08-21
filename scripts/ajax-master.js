@@ -1,4 +1,4 @@
-let AJAXLoads = $('<div>', {
+var LOADING = $('<div>', {
   'id': 'loader_background'
   ,'onclick': 'function() {return false}'
   ,css: {
@@ -80,20 +80,28 @@ $('<style>').append(`
 	}
 `).appendTo('head');
 
+function Loading( target ) {
+	LOADING.appendTo( target ? target : 'body' );
+}
+function Loaded() {
+	LOADING.fadeOut( 300, function() {
+		LOADING.remove();
+	} );
+	LOADING.fadeIn();
+}
 $(document).ajaxStart(function(){
-  AJAXLoads.appendTo('body');
-  AJAXLoads.css('background-color', 'rgba(255, 0, 0, 0, 0.5)');
+  Loading();
+  LOADING.css('background-color', 'rgba(255, 0, 0, 0, 0.5)');
 });
-
 $(document).ajaxError(function(event, xhr, settings, error){
-  AJAXLoads.css('background-color', '#ff2400');
+  LOADING.css('background-color', '#ff2400');
   $('#err-message-content').text(`${settings.url} : ${error}`)
   $('#loader').fadeOut(300);
   $('#err_message').fadeIn(300);
-  console.error(event, xhr, settings, error)
+  console.error(event, xhr, settings, error);
   
 });
 
 $(document).ajaxSuccess(function(event, xhr, settings){
-  AJAXLoads.remove();
+  Loaded();
 });
