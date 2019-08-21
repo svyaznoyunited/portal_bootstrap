@@ -18,7 +18,7 @@
 	<%=init_local_static({js: ['js/funcs.js', 'js/rf.js', 'js/consts.js']})%>
 	<script>
 		var MODEL;
-		var eplanId = "<%=Request.Query.GetOptProperty( 'epid', 'a945f220-0748-4a16-9a38-17b79d506a33' )%>";
+		var eplanId = "<%=Request.Query.GetOptProperty( 'epid', 'ba2f40e6-92d7-4664-8675-8eeb99f2a50d' )%>";
         $(document).ready( function() {
 			if ( eplanId != 0 ) {
 				eplanData = ObjectFromAPI({
@@ -27,15 +27,52 @@
 				});
 			}
 			print( eplanData )
-		});
+			$(h.d, {'class': 'col-md-4 mb-4'}).appendTo('#main')
+				.append(eplanData.plan.name);
 
-		$( "#ModelInstance" ).append( "<p>Test</p>" );
+			var tabsList = $(h.d, { "class": "col-md-4 mb-4" }).append(
+				$(h.ul, { "class": c.navTabs, "id": "myTab", "role": "tablist" }).append(
+				));
+			var contentList = [];
+
+			tabsList.appendTo('#main');
+			$(h.d, { "class": "tab-content", "id": "myTabContent" }).appendTo(tabsList);
+
+			for ( step in eplanData.steps ) {
+
+				eplanData.steps[step].step.name
+
+				$(h.li, { "class": "navItem" }).append(
+					$(h.a, {
+						"class": "nav-link"
+						,"data-toggle": "tab"
+						,"href": '#' + eplanData.steps[step].step.id
+						,"role": "tab"
+						,"aria-controls": eplanData.steps[step].step.id
+						,"text": eplanData.steps[step].step.name})					
+				).appendTo('#myTab')
+
+				var currentStepCnt = $(h.d, { "class": "main" }).appendTo(".col-md-4 mb-4");
+
+				for ( l in eplanData.steps[step].learnings ) {
+					currentStepCnt.append($(h.d, { "class": "tab-pane fade show active", "id": eplanData.steps[step].step.id, "role": "tabpanel", "aria-labelledby": eplanData.steps[step].step.id, "text": eplanData.steps[step].learnings[step].id }).appendTo("#myTabContent"))
+				}
+
+				contentList.push( currentStepCnt )
+
+			}
+
+		});
 
     </script>
 </head>
 <body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
 	<div class="card">
 		<div id='ModelInstance' class="card-body">
+			<div class="container">
+				<div id="main" class="row">
+				</div>
+			</div>
 		</div>
 	</div>
 </body>

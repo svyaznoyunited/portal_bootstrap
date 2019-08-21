@@ -1,4 +1,4 @@
-<%
+﻿<%
 	Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html');
 	init_globals('/portal/bs/portal_bootstrap/ep_new/editor/');
 %>
@@ -17,90 +17,93 @@
 	<%=init_static([ jq, ajm, bs, mdb, bss])%>
 	<%=init_local_static({js: ['js/funcs.js', 'js/rf.js', 'js/consts.js']})%>
     <script>
-        function Step( obj, parent ) {
+        function Rule( obj, parent ) {
           var self = this;
-
-					this.data = {};
 
 					this.saved = obj.saved;
 
-					this.index = parent.steps.length;
+					this.index = parent.rules.length;
           this.parent = parent;
 
-					this.new = obj.step.id ? false : true;
-          this.data.id = obj.step.id ? obj.step.id: ObjectFromAPI( {'$': 'tools.get.newid'} ).ID;
-          this.data.plan_id = parent.data.id;
-          this.data.name = obj.step.name;
-          this.data.access = obj.step.access;
-					this.data.archived = obj.step.archived;
+					this.new = obj.id ? false : true;
 
-          this.learnings = [];
+					this.data = {};
+          this.data.id = obj.id ? obj.id: ObjectFromAPI( {'$': 'tools.get.newid'} ).ID;
+          this.data.access_id = parent.data.id;
+					this.data.archived = obj.archived;
+
+					this.data.archived = 0;
+
+					this.data.catalog_id = obj.catalog_id;
+          this.data.field_id = obj.field_id;
+					this.data.operator_id = obj.operator_id;
+					this.data.value = obj.value;
+
+
 					this.dataFields = {};
 
-					this.dataFields.name = InputTextRF( this, 'name', 'plan-step-name-' + this.index );
-          this.dataFields.access = InputSelectRF( this, 'access', 'plan-step-access', ObjectFromAPI({'$': 'eplans.get.acs'}));
+					this.dataFields.field = InputSelectRF( this, 'field_id', 'access-rule-fld-'+this.data.id, ObjectFromAPI({
+							object: 'wt_flat.dbo.access_catalog_fields'
+							,fields: 'id__as__val,user_name__as__name'
+							,filter: toUrlStr( ["catalog_id = '" + self.data.catalog_id + "'"] )
+					}));
 
-					this.dataFields.child_container = $(h.d, { 'class': 'container' });
+					this.dataFields.catalog = InputSelectRF( this, 'catalog_id', 'access-rule-ctlg'+this.data.id, ObjectFromAPI({
+							object: 'wt_flat.dbo.access_catalogs'
+							,fields: 'id__as__val,user_name__as__name'
+						}), function(){
+							SPUpdate( self.dataFields.field, ObjectFromAPI({
+									object: 'wt_flat.dbo.access_catalog_fields'
+									,fields: 'id__as__val,user_name__as__name'
+									,filter: toUrlStr( ["catalog_id = '" + self.data.catalog_id + "'"] )
+								}));
+						}
+					);
+					this.dataFields.operator = InputSelectRF( this, 'operator_id', 'access-rule-op-'+this.data.id,ObjectFromAPI({
+							object: 'wt_flat.dbo.access_operators'
+							,fields: 'id__as__val,name'
+						}) );
+
+					this.dataFields.value = InputTextRF( this, 'value', 'access-rule-val-' + this.data.id );
 
 					this.dataFields.btn_remove = DelBtnInstance( this );
-          this.dataFields.btn_add_learning = $( h.bt, { 'class': c.btnp, 'text': 'Добавить обучение' } );
-          this.dataFields.btn_add_learning[0].onclick = function() {
-              self.addLearning();
-          }
 
 					this.template = $( h.d, { 'class': c.card, css:{ 'margin-bottom' : '1rem', 'transition' : '0.3s linear' } } ).append([
 						,this.dataFields.btn_remove
 						,$( h.d, { 'class': c.cardBody } ).append([
 							$( h.d, { 'class':  c.row, 'style': 'margin: 0 auto' } ).append([
 								$( h.d, { 'class':  c.md4 } ).append(
-									$( h.d, { 'class': c.mdf } ).append( InputTextInstance( this.dataFields.name, 'Название этапа' ) )
+									$( h.d, { 'class': c.mdf } ).append( this.dataFields.catalog )
 								)
-								,$( h.d, { 'class':  c.md4 } ).append(
-									$( h.d, { 'class': c.mdf } ).append( this.dataFields.access )
+								,$( h.d, { 'class':  c.md2 } ).append(
+									$( h.d, { 'class': c.mdf } ).append( this.dataFields.field )
 								)
-								,$( h.d, { 'class':  c.md4 } ).append(
-									$( h.d, { 'class': c.mdf } ).append( this.dataFields.btn_add_learning )
+								,$( h.d, { 'class':  c.md2 } ).append(
+									$( h.d, { 'class': c.mdf } ).append( this.dataFields.operator )
+								)
+								,$( h.d, { 'class':  c.md2 } ).append(
+									$( h.d, { 'class': c.mdf } ).append( InputTextInstance( this.dataFields.value, 'Значение' ) )
 								)
 							])
-							,this.dataFields.child_container
 						])
 					]);
 
-          this.addLearning = function( obj={} ) {
-							var index = this.learnings.push( new Learning( obj, this ) );
-              this.learnings[index-1].instance();
-          }
           this.instance = function() {
             this.template.appendTo( this.parent.dataFields.child_container );
-						this.dataFields.access.selectpicker('refresh');
+						this.dataFields.catalog.selectpicker();
+						this.dataFields.field.selectpicker();
+						this.dataFields.operator.selectpicker();
           }
-					this.removeChild = function( LearnObj ) {
-						LearnObj.data.archived = 1;
-						ObjectFromAPI({
-							'$': 'eplans.upd.epsteplearn'
-							,data: toUrlStr( LearnObj.data )
-						});
-						this.learnings.splice( LearnObj.index, 1);
-						var IDX = 0;
-						for ( l in this.learnings ) {
-							this.learnings[ l ].index = IDX;
-							IDX++;
-						}
-					}
 					this.save = function() {
 						if ( !this.saved ) {
-							var method = 'eplans.upd.epstep';
+							var method = 'access.upd.rule';
 							if ( this.new ) {
-								method = 'eplans.new.epstep';
+								method = 'access.new.rule';
 							}
 							print( 'Этап пойдёт по методу ' + method )
 							ObjectFromAPI( { "$": method, data: toUrlStr( this.data ) } );
 							this.saved = true;
 							this.new = false;
-						}
-
-						for ( learning in this.learnings ) {
-							print( this.learnings[learning].save() )
 						}
 					}
           for ( learning in obj.learnings ) {
@@ -108,29 +111,28 @@
           }
         }
 
-        function EPModel( obj ) {
+        function Model( obj ) {
           var self = this;
+
 					this.saved = obj.saved;
 					this.data = {};
-					this.new = obj.plan.id ? false : true;
-          this.data.id = obj.plan.id ? obj.plan.id : ObjectFromAPI( {'$': 'tools.get.newid'} ).ID;
-          this.data.name = obj.plan.name;
-          this.data.tech_name = obj.plan.tech_name;
-					this.data.access = obj.plan.access;
-          this.data.archived = obj.plan.archived;
 
-          this.steps = [];
+					this.new = obj.access.id ? false : true;
+
+          this.data.id = obj.access.id ? obj.access.id : ObjectFromAPI( {'$': 'tools.get.newid'} ).ID;
+          this.data.name = obj.access.name;
+          this.data.archived = obj.access.archived;
+
+          this.rules = [];
 					this.dataFields = {};
 
-					this.dataFields.name = InputTextRF( this, 'name', 'plan-name' );
-					this.dataFields.tech_name = InputTextRF( this, 'tech_name', 'plan_tech_name' );
-					this.dataFields.access = InputSelectRF( this, 'access', 'plan-access', ObjectFromAPI({'$': 'eplans.get.acs'}));
+					this.dataFields.name = InputTextRF( this, 'name', 'access-name' );
 
           this.dataFields.child_container = $(h.d, { class: 'container' });
 
-          this.dataFields.btn_add_step = $( h.bt, { 'class': c.btnp, 'text': 'Добавить этап' } );
+          this.dataFields.btn_add_step = $( h.bt, { 'class': c.btnp, 'text': 'Добавить правило' } );
           this.dataFields.btn_add_step[0].onclick = function() {
-              self.addStep();
+              self.addRule();
           }
 
           this.template = $( h.d, { 'class':  c.row, 'style': 'margin: 0 auto' } ).append([
@@ -140,14 +142,6 @@
 							)
 						)
 						,$( h.d, { 'class':  c.md3 } ).append(
-							$( h.d, { 'class': c.mdf } ).append(
-								InputTextInstance( this.dataFields.tech_name, 'Техническое название' )
-							)
-						)
-						,$( h.d, { 'class':  c.md3 } ).append(
-							$( h.d, { 'class': c.mdf } ).append( this.dataFields.access )
-						)
-						,$( h.d, { 'class':  c.md3 } ).append(
 							$( h.d, { 'class': c.mdf } ).append( this.dataFields.btn_add_step )
 						)
 					]);
@@ -155,62 +149,46 @@
           this.instance = function( target ) {
               this.template.appendTo( target );
               this.dataFields.child_container.appendTo( target );
-              this.dataFields.access.selectpicker();
 							if ( this.saved ) {
 								this.dataFields.name.focusin();
-								this.dataFields.tech_name.focusin();
 							}
           }
-          this.addStep = function( obj={} ) {
-						if ( !obj.step ) {
-							obj.step={};
+          this.addRule = function( obj={} ) {
+						if ( !obj.rule ) {
+							obj.rule={};
 						}
-            var index = this.steps.push( new Step( obj, this ) );
-            this.steps[index-1].instance();
+            var index = this.rules.push( new Rule( obj, this ) );
+            this.rules[index-1].instance();
           }
-					this.removeChild = function( StepObj ) {
-						print( StepObj )
-						StepObj.data.archived = 1;
+
+					this.removeChild = function( RuleObj ) {
+						print( RuleObj )
+						RuleObj.data.archived = 1;
 						ObjectFromAPI({
-							'$': 'eplans.upd.epstep'
-							,data: toUrlStr( StepObj.data )
+							'$': 'access.upd.rule'
+							,data: toUrlStr( RuleObj.data )
 						});
-						this.steps.splice( StepObj.index, 1);
+						this.rules.splice( RuleObj.index, 1);
 						var IDX = 0;
-						for ( s in this.steps ) {
-							this.steps[s].index = IDX;
+						for ( s in this.rules ) {
+							this.rules[s].index = IDX;
 							IDX++;
 						}
 					}
 
-					this.all = function() {
-						var data = {};
-						data.plan = this.data;
-						data.steps = [];
-						for ( s in this.steps ) {
-							var index = data.steps.push( this.steps[s].data );
-							data.steps[index-1].learnings = [];
-							for ( l in this.steps[ s ].learnings ) {
-								data.steps[index-1].learnings.push( this.steps[ s ].learnings[l].data );
-							}
-						}
-						return data;
-					}
-
 					this.saveAll = function() {
 						if ( !this.saved ) {
-							var method = 'eplans.upd.ep';
+							var method = 'access.upd.self';
 							if ( this.new ) {
-								method = 'eplans.new.ep';
+								method = 'access.new.self';
 							}
-							print( 'План пойдёт по методу ' + method )
 							ObjectFromAPI( { "$": method, data: toUrlStr( this.data ) } );
 							this.saved = true;
 							this.new = false;
 						}
 
-						for ( step in this.steps ) {
-							this.steps[step].save()
+						for ( rule in this.rules ) {
+							this.rules[rule].save()
 						}
 						alert( 'Сохранено!' )
 					}
@@ -222,51 +200,48 @@
 						if ( e.code == 'KeyI' && e.shiftKey && e.ctrlKey && e.altKey ) {
 							alert( self.data.id );
 						}
-						if ( e.code == 'KeyA' && e.shiftKey && e.ctrlKey && e.altKey ) {
-							if ( confirm( 'Подтвержатете архивацию плана?' ) ) {
-								self.data.archived = 1;
-								ObjectFromAPI({
-									'$': 'eplans.upd.ep'
-									,data: toUrlStr( self.data )
-								});
-								alert( 'План в архиве.' );
-								window.location.replace( window.location.origin + '/view_doc.html?mode=eplans_list_view_adm' );
-							}
+						if ( e.code == 'KeyN' && e.ctrlKey && e.altKey ) {
+							e.preventDefault();
+							window.open( window.location.origin + '/view_doc.html?mode=eplans_access_edit' );
 						}
 					}
 
-          for ( step in obj.steps ) {
-						var step = obj.steps[step];
-						step.saved = true;
-            this.addStep( step );
+          for ( rule in obj.rules ) {
+						var rule = obj.rules[rule];
+						rule.saved = true;
+            this.addRule( rule );
           }
         }
 
-				var MODEL;
-				var eplanId = "<%=Request.Query.GetOptProperty( 'epid', '0' )%>";
-        $(document).ready( function() {
-					var eplanData = {
-						plan: {}
-					};
-					if ( eplanId != 0 ) {
-						eplanData = ObjectFromAPI({
-							'$': 'eplans.get.plan'
-							,'planid': eplanId
-						});
-					}
-					if ( !eplanData.err && eplanData.plan ) {
-						eplanData.saved = true;
-					} else if ( eplanId != 0 && eplanData.err ) {
-						window.location.replace( window.location.origin + '/view_doc.html?mode=eplans_edit' );
-					}
-          MODEL = new EPModel( eplanData );
-          MODEL.instance( '#ModelInstance' );
+			var MODEL;
+			var accessId = "<%=Request.Query.GetOptProperty( 'acid', '0' )%>";
+	    $(document).ready( function() {
 
-					for ( i in MODEL.steps ) {
-						MODEL.steps[i].dataFields.name.focusin();
-					}
+				var acsData = {
+					access: {}
+				};
 
-        });
+				if ( accessId != 0 ) {
+					acsData = ObjectFromAPI({
+						'$': 'access.get.self'
+						,'accessid': accessId
+					});
+				}
+
+				if ( !acsData.err && acsData.access ) {
+					acsData.saved = true;
+				} else if ( accessId != 0 && acsData.err ) {
+					window.location.replace( window.location.origin + '/view_doc.html?mode=eplans_access_edit' );
+				}
+
+	      MODEL = new Model( acsData );
+	      MODEL.instance( '#ModelInstance' );
+
+				for ( i in MODEL.rules ) {
+					MODEL.rules[i].dataFields.value.focusin();
+				}
+
+	    });
     </script>
 </head>
 <body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">

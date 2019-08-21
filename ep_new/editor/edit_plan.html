@@ -126,7 +126,7 @@
 					this.dataFields = {};
 
 					this.dataFields.name = InputTextRF( this, 'name', 'plan-step-name-' + this.index );
-          this.dataFields.access = InputSelectRF( this, 'access', 'plan-step-access', ObjectFromAPI({'$': 'eplans.get.acs'}));
+          this.dataFields.access = InputSelectRF( this, 'access', 'plan-step-'+this.index+'-access', ObjectFromAPI({'$': 'eplans.get.acs'}));
 
 					this.dataFields.child_container = $(h.d, { 'class': 'container' });
 
@@ -323,7 +323,6 @@
 						}
 						if ( e.code == 'KeyN' && e.ctrlKey && e.altKey ) {
 							e.preventDefault();
-							print( e );
 							window.open( window.location.origin + '/view_doc.html?mode=eplans_edit' );
 						}
 					}
