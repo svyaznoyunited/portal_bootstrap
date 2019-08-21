@@ -321,6 +321,11 @@
 								window.location.replace( window.location.origin + '/view_doc.html?mode=eplans_list_view_adm' );
 							}
 						}
+						if ( e.code == 'KeyN' && e.ctrlKey && e.altKey ) {
+							e.preventDefault();
+							print( e );
+							window.open( window.location.origin + '/view_doc.html?mode=eplans_edit' );
+						}
 					}
 
           for ( step in obj.steps ) {
@@ -362,6 +367,7 @@
 		<center style="color: #666;">Сохранить изменения: CTRL и S</center>
 		<center style="color: #666;">Архивация плана: SHIF CTRL ALT и A</center>
 		<center style="color: #666;">Узнать ID: SHIF CTRL ALT и I</center>
+		<center style="color: #666;">Новый план: CTRL ALT и N</center>
 	</div>
 	<br/>
 	<div class="card">
