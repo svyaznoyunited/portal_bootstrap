@@ -7,6 +7,7 @@ const h = {
     ,ce: '<button>'
     ,sn: '<span>'
     ,o: '<option>'
+    ,p: '<p>'
 }
 const c = {
      md2: 'col-md-2 mb-2'
@@ -15,6 +16,7 @@ const c = {
     ,row: 'row'
     ,close: 'close'
     ,card: 'card'
+    ,fontBolder: 'font-weight-bolder'
     ,cardBody: 'card-body'
     ,spr: 'selectpicker'
     ,mdf: 'md-form form-sm'

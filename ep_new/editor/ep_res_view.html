@@ -1,0 +1,42 @@
+﻿<%
+	Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html');
+	init_globals('/portal/bs/portal_bootstrap/ep_new/editor/');
+%>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <style>
+        .del-danger {
+            background-color: rgba(251, 49, 49, 0.678)!important;
+        }
+    </style>
+	<%=init_static([ jq, ajm, bs, mdb, bss])%>
+	<%=init_local_static({js: ['js/funcs.js', 'js/rf.js', 'js/consts.js']})%>
+	<script>
+		var MODEL;
+		var eplanId = "<%=Request.Query.GetOptProperty( 'epid', 'a945f220-0748-4a16-9a38-17b79d506a33' )%>";
+        $(document).ready( function() {
+			if ( eplanId != 0 ) {
+				eplanData = ObjectFromAPI({
+					'$': 'eplans.get.plan'
+					,'planid': eplanId
+				});
+			}
+			print( eplanData )
+		});
+
+		$( "#ModelInstance" ).append( "<p>Test</p>" );
+
+    </script>
+</head>
+<body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
+	<div class="card">
+		<div id='ModelInstance' class="card-body">
+		</div>
+	</div>
+</body>
+</html>
