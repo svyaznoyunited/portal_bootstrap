@@ -10,9 +10,25 @@
     <meta charset="utf-8">
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <style>
-        .del-danger {
-            background-color: rgba(251, 49, 49, 0.678)!important;
-        }
+    .del-danger {
+        background-color: rgba(251, 49, 49, 0.678)!important;
+    }
+	.title {
+		padding: 2rem;
+		margin-bottom: 3rem;
+		background-color: #bae2ee;
+		text-align: center;
+		text-transform: uppercase;
+		letter-spacing: 5px;
+	}
+
+	.title h3 {
+		padding: 1rem;
+	}
+
+	.operation {
+		margin-bottom: 3rem;
+	}
     </style>
 	<%=init_static([ jq, ajm, bs, mdb, bss])%>
 	<%=init_local_static({js: ['js/funcs.js', 'js/rf.js', 'js/consts.js']})%>
@@ -131,7 +147,7 @@
 					this.dataFields.child_container = $(h.d, { 'class': 'container' });
 
 					this.dataFields.btn_remove = DelBtnInstance( this );
-          this.dataFields.btn_add_learning = $( h.bt, { 'class': c.btnp, 'text': 'Добавить обучение' } );
+          this.dataFields.btn_add_learning = $( h.bt, { 'class': c.btnw, 'text': 'Добавить обучение' } );
           this.dataFields.btn_add_learning[0].onclick = function() {
               self.addLearning();
           }
@@ -206,17 +222,19 @@
           this.data.tech_name = obj.plan.tech_name;
 					this.data.access = obj.plan.access;
           this.data.archived = obj.plan.archived;
+					this.data.expired_time = obj.plan.expired_time;
 
           this.steps = [];
 					this.dataFields = {};
 
 					this.dataFields.name = InputTextRF( this, 'name', 'plan-name' );
+					this.dataFields.expired_time = InputTextRF( this, 'expired_time', 'plan-expire_time' );
 					this.dataFields.tech_name = InputTextRF( this, 'tech_name', 'plan_tech_name' );
 					this.dataFields.access = InputSelectRF( this, 'access', 'plan-access', ObjectFromAPI({'$': 'eplans.get.acs'}));
 
           this.dataFields.child_container = $(h.d, { class: 'container' });
 
-          this.dataFields.btn_add_step = $( h.bt, { 'class': c.btnp, 'text': 'Добавить этап' } );
+          this.dataFields.btn_add_step = $( h.bt, { 'class': c.btnw, 'text': 'Добавить этап' } );
           this.dataFields.btn_add_step[0].onclick = function() {
               self.addStep();
           }
@@ -227,15 +245,20 @@
 								InputTextInstance( this.dataFields.name, 'Название' )
 							)
 						)
-						,$( h.d, { 'class':  c.md3 } ).append(
+						,$( h.d, { 'class':  c.md2 } ).append(
 							$( h.d, { 'class': c.mdf } ).append(
 								InputTextInstance( this.dataFields.tech_name, 'Техническое название' )
 							)
 						)
-						,$( h.d, { 'class':  c.md3 } ).append(
+						,$( h.d, { 'class':  c.md2 } ).append(
 							$( h.d, { 'class': c.mdf } ).append( this.dataFields.access )
 						)
-						,$( h.d, { 'class':  c.md3 } ).append(
+						,$( h.d, { 'class':  c.md1 } ).append(
+							$( h.d, { 'class': c.mdf } ).append(
+								InputTextInstance( this.dataFields.expired_time, 'Время жизни(ч.)' )
+							)
+						)
+						,$( h.d, { 'class':  c.md1 } ).append(
 							$( h.d, { 'class': c.mdf } ).append( this.dataFields.btn_add_step )
 						)
 					]);
@@ -247,6 +270,7 @@
 							if ( this.saved ) {
 								this.dataFields.name.focusin();
 								this.dataFields.tech_name.focusin();
+								this.dataFields.expired_time.focusin();
 							}
           }
           this.addStep = function( obj={} ) {
@@ -269,20 +293,6 @@
 							this.steps[s].index = IDX;
 							IDX++;
 						}
-					}
-
-					this.all = function() {
-						var data = {};
-						data.plan = this.data;
-						data.steps = [];
-						for ( s in this.steps ) {
-							var index = data.steps.push( this.steps[s].data );
-							data.steps[index-1].learnings = [];
-							for ( l in this.steps[ s ].learnings ) {
-								data.steps[index-1].learnings.push( this.steps[ s ].learnings[l].data );
-							}
-						}
-						return data;
 					}
 
 					this.saveAll = function() {
@@ -363,10 +373,15 @@
 </head>
 <body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
 	<div class="card">
-		<center style="color: #666;">Сохранить изменения: CTRL и S</center>
-		<center style="color: #666;">Архивация плана: SHIF CTRL ALT и A</center>
-		<center style="color: #666;">Узнать ID: SHIF CTRL ALT и I</center>
-		<center style="color: #666;">Новый план: CTRL ALT и N</center>
+		<div class="title">
+			<h3>Редактор планов</h3>
+		</div>
+		<div class="operation">
+			<center style="color: #666;">Сохранить изменения: CTRL и S</center>
+			<center style="color: #666;">Архивация плана: SHIF CTRL ALT и A</center>
+			<center style="color: #666;">Узнать ID: SHIF CTRL ALT и I</center>
+			<center style="color: #666;">Новый план: CTRL ALT и N</center>
+		</div>
 	</div>
 	<br/>
 	<div class="card">

@@ -11,6 +11,7 @@ const h = {
     ,ul: '<ul>'
     ,li: '<li>'
     ,a: '<a>'
+    ,h3: '<h3>'
 }
 const c = {
      md2: 'col-md-2 mb-2'

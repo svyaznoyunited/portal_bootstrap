@@ -43,24 +43,24 @@
 		var elems = [];
 
 		$( document ).ready( function() {
-			var epList = ObjectFromAPI(
+			var accessList = ObjectFromAPI(
 			{
 				object: 'wt_flat.dbo.education_plan'
 				,fields: 'id,name,tech_name,ISNULL( archived, 0 )__as__archived'
 			});
 
 
-			for ( elem in epList ) {
-				var element = $(h.d, {class: 'container filter ', id: epList[elem].id}).append([
+			for ( elem in accessList ) {
+				var element = $(h.d, {class: 'container filter ', id: accessList[elem].id}).append([
 					$(h.d, {class: 'row'}).append([
 						$(h.d, {class: 'col-12' }).append([
-							$(h.d, {class: 'card card-style '  + (epList[elem].archived==0 ? '' : 'archived')}).append([
-								,$(h.d, {text: (epList[elem].archived==0 ? '' : '(АРХИВ) ') + epList[elem].name + ' [ ' + epList[elem].tech_name+ ' ]'})])
+							$(h.d, {class: 'card card-style '  + (accessList[elem].archived==0 ? '' : 'archived')}).append([
+								,$(h.d, {text: (accessList[elem].archived==0 ? '' : '(АРХИВ) ') + accessList[elem].name + ' [ ' + accessList[elem].tech_name+ ' ]'})])
 							])
 						])
 					])
 
-				elems.push( {data: {name: epList[elem].name,tech_name:epList[elem].tech_name}, elem: element} )
+				elems.push( {data: {name: accessList[elem].name,tech_name:accessList[elem].tech_name}, elem: element} )
 				element[0].onclick = function() {
 					window.open( window.location.origin + '/view_doc.html?mode=eplans_edit&epid='+ this.id);
 				}
@@ -77,9 +77,9 @@
 
 				$('.filter').not('.filtered').fadeOut();
 				for ( elem in elems ) {
-					if ( 
-						elems[elem].data.name.toLowerCase().indexOf( this.value.toLowerCase() ) != -1 
-						|| elems[elem].data.tech_name.toLowerCase().indexOf( this.value.toLowerCase() ) != -1  
+					if (
+						elems[elem].data.name.toLowerCase().indexOf( this.value.toLowerCase() ) != -1
+						|| elems[elem].data.tech_name.toLowerCase().indexOf( this.value.toLowerCase() ) != -1
 					) {
 						elems[elem].elem.fadeIn();
 						elems[elem].elem.addClass( 'filtered' );
@@ -93,7 +93,7 @@
 			});
 
 		});
-		
+
     </script>
 </head>
 <body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">

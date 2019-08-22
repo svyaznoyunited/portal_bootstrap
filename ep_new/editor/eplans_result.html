@@ -1,0 +1,138 @@
+﻿<%
+	Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html');
+	init_globals('/portal/bs/portal_bootstrap/ep_new/editor/');
+%>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <style>
+
+	a:visited { color: #007bff; }
+	
+	.tab-pane { margin-top: 0.7rem; }
+
+	.del-danger { background-color: rgba(251, 49, 49, 0.678)!important; }
+
+	.tab-pane { padding: 1rem; }
+
+	.tab-content>.tab-pane {
+		background-color: #A290BE;
+		text-align: center;
+		color: #fff;
+		margin-bottom: 2rem;
+		margin-top: 3rem;
+	}
+
+	.title {
+		padding: 2rem;
+		margin-bottom: 3rem;
+		background-color: #BAE2EE;
+		text-align: center;
+		text-transform: uppercase;
+		letter-spacing: 5px;
+	}
+
+	.title h3 {
+		padding: 1rem;
+	}
+
+	.tab-content>.tab-pane {
+		animation: fadeIn ease 2s;
+		-webkit-animation: fadeIn ease 2s;
+		-moz-animation: fadeIn ease 2s;
+		-o-animation: fadeIn ease 2s;
+		-ms-animation: fadeIn ease 2s;
+	}
+
+	#step-name {
+		background-color: #ffd4e0;
+		margin-top: 1.5rem;
+		padding: 3.4rem;
+		text-align: center;
+		animation: fadeIn ease 2s;
+		-webkit-animation: fadeIn ease 2s;
+		-moz-animation: fadeIn ease 2s;
+		-o-animation: fadeIn ease 2s;
+		-ms-animation: fadeIn ease 2s;
+	}
+	#myTab { margin-top: 1.5rem; }
+
+    </style>
+	<%=init_static([ jq, ajm, bs, mdb, bss])%>
+	<%=init_local_static({js: ['js/funcs.js', 'js/rf.js', 'js/consts.js']})%>
+	<script>
+		var MODEL;
+		var eplanId = "<%=Request.Query.GetOptProperty( 'epid', '4655AEC0-6E72-4D25-9742-9944559ADB7F' )%>";
+        $(document).ready( function() {
+			if ( eplanId != 0 ) {
+				eplanData = ObjectFromAPI({
+					'$': 'eplans.get.result'
+					,'resid': eplanId
+				});
+			}
+
+			($(h.h3, { "text": eplanData.plan.name })).appendTo(".title");
+
+			var tabsList = $(h.d, { "class": "col-md-12 mb-12", "id" : "tabs" }).append(
+				$(h.ul, { "class": c.navTabs, "id": "myTab", "role": "tablist" }).append(
+				));
+			var contentList = [];
+
+			tabsList.appendTo('#main');
+			$(h.d, { "class": "tab-content", "id": "my-tab-content" }).appendTo(tabsList);
+
+			for ( step in eplanData.steps ) {
+
+				eplanData.steps[step].step.name
+
+				$(h.li, { "class": "navItem" }).append(
+					$(h.a, {
+						"class": "nav-link"
+						,"data-toggle": "tab"
+						,"href": '#' + eplanData.steps[step].step.id
+						,"role": "tab"
+						,"onclick" : "uiTabs(0)"
+						,"aria-controls": eplanData.steps[step].step.id
+						,"text": eplanData.steps[step].step.name})					
+				).appendTo('#myTab')
+
+				var currentStepCnt = $(h.d, { "class": "main" }).appendTo(".col-md-6 mb-6");
+				var learnings = [];
+				for ( l in eplanData.steps[step].learnings ) {
+					learnings.push(
+						$(h.d, { 'text': eplanData.steps[step].learnings[l].id })
+					)
+				}
+
+				currentStepCnt.append($(h.d, { 
+					"class": "card tab-pane fade show"
+					,"id": eplanData.steps[step].step.id
+					,"role": "tabpanel"
+					,"aria-labelledby": eplanData.steps[step].step.id
+				}).append( learnings ).appendTo("#my-tab-content"));
+
+				contentList.push( currentStepCnt )
+
+			}
+
+		});
+		
+    </script>
+</head>
+<body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
+	<div class="card">
+		<div class="title">
+		</div>
+		<div id='ModelInstance' class="card-body">
+			<div class="container">
+				<div id="main" class="row">
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
