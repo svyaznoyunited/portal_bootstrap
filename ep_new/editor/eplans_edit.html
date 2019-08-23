@@ -10,9 +10,21 @@
     <meta charset="utf-8">
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <style>
-    .del-danger {
-        background-color: rgba(251, 49, 49, 0.678)!important;
-    }
+
+	.title h3 { padding: 1rem; }
+
+	.operation { margin-bottom: 3rem; }
+
+	.card { border-radius: 0!important; }
+	
+    .del-danger { background-color: rgba(251, 49, 49, 0.678)!important; }
+
+	.container {
+		margin-right: 15px!important;
+    	margin-left: 15px!important;
+		max-width: 100%!important;
+	}
+
 	.title {
 		padding: 2rem;
 		margin-bottom: 3rem;
@@ -21,14 +33,7 @@
 		text-transform: uppercase;
 		letter-spacing: 5px;
 	}
-
-	.title h3 {
-		padding: 1rem;
-	}
-
-	.operation {
-		margin-bottom: 3rem;
-	}
+	
     </style>
 	<%=init_static([ jq, ajm, bs, mdb, bss])%>
 	<%=init_local_static({js: ['js/funcs.js', 'js/rf.js', 'js/consts.js']})%>
@@ -50,8 +55,11 @@
           this.data.education_type = obj.education_type ? obj.education_type : 'course';
           this.data.access = obj.access;
 					this.data.archived = obj.archived;
+					this.data.expired_time = obj.expired_time;
 
 					this.dataFields = {};
+
+					this.dataFields.expired_time = InputTextRF( this, 'expired_time', 'plan-step-learning-expired-time' );
 
 					this.dataFields.edu_id = InputSelectRF( this, 'education_id', 'plan-step-'+this.parent.index+'-learning-id-'+this.index, ObjectFromAPI(
 						{
@@ -82,14 +90,19 @@
 					this.template = $( h.d, { 'class': c.card, css: { 'margin-bottom' : '1rem', 'transition' : '0.3s linear' } } ).append([
 						this.dataFields.btn_remove
 						,$( h.d, { 'class': c.cardBody } ).append([
-							$( h.d, { 'class':  c.row, 'style': 'margin: 0 auto' } ).append([
-								$( h.d, { 'class':  c.md4 } ).append(
+							$( h.d, { 'class':  c.row, 'style': 'margin: 0 auto; padding: 2rem;' } ).append([
+								$( h.d, { 'class':  c.md3 } ).append(
+									$( h.d, { 'class': c.mdf } ).append(
+										InputTextInstance( this.dataFields.expired_time, 'Время жизни(ч.)' )
+									)
+								)
+								,$( h.d, { 'class':  c.md3 } ).append(
 									$( h.d, { 'class': c.mdf } ).append( this.dataFields.edu_type )
 								)
-								,$( h.d, { 'class':  c.md4 } ).append(
+								,$( h.d, { 'class':  c.md3 } ).append(
 									$( h.d, { 'class': c.mdf } ).append( this.dataFields.edu_id )
 								)
-								,$( h.d, { 'class':  c.md4 } ).append(
+								,$( h.d, { 'class':  c.md3 } ).append(
 									$( h.d, { 'class': c.mdf } ).append( this.dataFields.access )
 								)
 							])
@@ -137,12 +150,14 @@
           this.data.name = obj.step.name;
           this.data.access = obj.step.access;
 					this.data.archived = obj.step.archived;
+					this.data.expired_time = obj.step.expired_time;
 
           this.learnings = [];
 					this.dataFields = {};
 
 					this.dataFields.name = InputTextRF( this, 'name', 'plan-step-name-' + this.index );
           this.dataFields.access = InputSelectRF( this, 'access', 'plan-step-'+this.index+'-access', ObjectFromAPI({'$': 'eplans.get.acs'}));
+					this.dataFields.expired_time = InputTextRF( this, 'expired_time', 'plan-step-expired-time' );
 
 					this.dataFields.child_container = $(h.d, { 'class': 'container' });
 
@@ -155,14 +170,19 @@
 					this.template = $( h.d, { 'class': c.card, css:{ 'margin-bottom' : '1rem', 'transition' : '0.3s linear' } } ).append([
 						,this.dataFields.btn_remove
 						,$( h.d, { 'class': c.cardBody } ).append([
-							$( h.d, { 'class':  c.row, 'style': 'margin: 0 auto' } ).append([
-								$( h.d, { 'class':  c.md4 } ).append(
+							$( h.d, { 'class':  c.row, 'style': 'margin: 0 auto; padding: 2rem;' } ).append([
+								$( h.d, { 'class':  c.md3 } ).append(
 									$( h.d, { 'class': c.mdf } ).append( InputTextInstance( this.dataFields.name, 'Название этапа' ) )
+								)
+								,$( h.d, { 'class':  c.md3 } ).append(
+									$( h.d, { 'class': c.mdf } ).append(
+										InputTextInstance( this.dataFields.expired_time, 'Время жизни(ч.)' )
+									)
 								)
 								,$( h.d, { 'class':  c.md4 } ).append(
 									$( h.d, { 'class': c.mdf } ).append( this.dataFields.access )
 								)
-								,$( h.d, { 'class':  c.md4 } ).append(
+								,$( h.d, { 'class':  c.md2 } ).append(
 									$( h.d, { 'class': c.mdf } ).append( this.dataFields.btn_add_learning )
 								)
 							])
@@ -215,8 +235,9 @@
         function EPModel( obj ) {
           var self = this;
 					this.saved = obj.saved;
-					this.data = {};
 					this.new = obj.plan.id ? false : true;
+
+					this.data = {};
           this.data.id = obj.plan.id ? obj.plan.id : ObjectFromAPI( {'$': 'tools.get.newid'} ).ID;
           this.data.name = obj.plan.name;
           this.data.tech_name = obj.plan.tech_name;
@@ -228,7 +249,7 @@
 					this.dataFields = {};
 
 					this.dataFields.name = InputTextRF( this, 'name', 'plan-name' );
-					this.dataFields.expired_time = InputTextRF( this, 'expired_time', 'plan-expire_time' );
+					this.dataFields.expired_time = InputTextRF( this, 'expired_time', 'plan-expired-time' );
 					this.dataFields.tech_name = InputTextRF( this, 'tech_name', 'plan_tech_name' );
 					this.dataFields.access = InputSelectRF( this, 'access', 'plan-access', ObjectFromAPI({'$': 'eplans.get.acs'}));
 
@@ -239,8 +260,8 @@
               self.addStep();
           }
 
-          this.template = $( h.d, { 'class':  c.row, 'style': 'margin: 0 auto' } ).append([
-						$( h.d, { 'class':  c.md3 } ).append(
+          this.template = $( h.d, { 'class':  c.row, 'style': 'margin: 0 auto; padding: 2rem;' } ).append([
+						$( h.d, { 'class':  c.md2 } ).append(
 							$( h.d, { 'class': c.mdf } ).append(
 								InputTextInstance( this.dataFields.name, 'Название' )
 							)
@@ -251,14 +272,14 @@
 							)
 						)
 						,$( h.d, { 'class':  c.md2 } ).append(
-							$( h.d, { 'class': c.mdf } ).append( this.dataFields.access )
-						)
-						,$( h.d, { 'class':  c.md1 } ).append(
 							$( h.d, { 'class': c.mdf } ).append(
 								InputTextInstance( this.dataFields.expired_time, 'Время жизни(ч.)' )
 							)
 						)
-						,$( h.d, { 'class':  c.md1 } ).append(
+						,$( h.d, { 'class':  c.md4 } ).append(
+							$( h.d, { 'class': c.mdf } ).append( this.dataFields.access )
+						)
+						,$( h.d, { 'class':  c.md2 } ).append(
 							$( h.d, { 'class': c.mdf } ).append( this.dataFields.btn_add_step )
 						)
 					]);
@@ -366,6 +387,10 @@
 
 					for ( i in MODEL.steps ) {
 						MODEL.steps[i].dataFields.name.focusin();
+						MODEL.steps[i].dataFields.expired_time.focusin();
+						for ( r in MODEL.steps[i].learnings ) {
+							MODEL.steps[i].learnings[r].dataFields.expired_time.focusin();
+						}
 					}
 
         });

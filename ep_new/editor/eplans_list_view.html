@@ -11,21 +11,21 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <style>
 
-	.archived {
+	.btn { width: 100%; }
+
+    .del-danger { background-color: rgba(251, 49, 49, 0.678)!important; }
+
+    .card { border-radius: 0!important; }
+
+    .card-body { text-align: center; }
+
+    .title h3 { padding: 1rem; }
+
+    .main-content { margin: 0 auto; }
+
+    .archived {
 		background-color: #666!important;
 		color: #fefefe
-	}
-
-	.btn {
-		width: 100%;
-	}
-
-    .del-danger {
-		background-color: rgba(251, 49, 49, 0.678)!important;
-	}
-
-	.card {
-		border-radius: 0!important;
 	}
 
 	.card-style {
@@ -34,26 +34,17 @@
 	}
 
 	.card-style:hover {
-		background-color: #BFA2C1;
-		color: #fff;
-		transition: 0.3s;
+		background-color: #5EDA9F;
+		transition: 0.5s;
 	}
 
-	.card-body {
-		text-align: center;
-	}
-
-	.title {
+    .title {
 		padding: 2rem;
 		margin-bottom: 3rem;
 		background-color: #BAE2EE;
 		text-align: center;
 		text-transform: uppercase;
 		letter-spacing: 5px;
-	}
-
-	.title h3 {
-		padding: 1rem;
 	}
 
     </style>
@@ -66,24 +57,23 @@
 		$( document ).ready( function() {
 			var accessList = ObjectFromAPI(
 			{
-				object: 'wt_flat.dbo.education_plan'
-				,fields: 'id,name,tech_name,ISNULL( archived, 0 )__as__archived'
+				'$': 'eplans.get.result_list'
 			});
 
 
 			for ( elem in accessList ) {
 				var element = $(h.d, {class: 'container filter ', id: accessList[elem].id}).append([
 					$(h.d, {class: 'row'}).append([
-						$(h.d, {class: 'col-12' }).append([
-							$(h.d, {class: 'card card-style '  + (accessList[elem].archived==0 ? '' : 'archived')}).append([
-								,$(h.d, {text: (accessList[elem].archived==0 ? '' : '(АРХИВ) ') + accessList[elem].name + ' [ ' + accessList[elem].tech_name+ ' ]'})])
+						$(h.d, {class: 'col-6 main-content' }).append([
+							$(h.d, {class: 'card card-style'}).append([
+								,$(h.d, {text: accessList[elem].name + ' Пройти до: ' + accessList[elem].expire_date.replace('T', ', ').replace('+00:00', '')})])
 							])
 						])
 					])
 
 				elems.push( {data: {name: accessList[elem].name,tech_name:accessList[elem].tech_name}, elem: element} )
 				element[0].onclick = function() {
-					window.open( window.location.origin + '/view_doc.html?mode=eplans_edit&epid='+ this.id);
+					window.open( window.location.origin + '/view_doc.html?mode=eplans_result&resid='+ this.id);
 				}
 				$( '#ModelInstance' ).append(element);
 			}
@@ -119,20 +109,15 @@
 </head>
 <body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
 	<div class="card">
-		<div class="title">
-			<h3>Список планов для редактирования</h3>
-		</div>
+        <div class="title">
+            <h3>Список планов</h3>
+        </div>
 		<div class="container">
 			<div class="row">
-				<div class="col-8">
+				<div class="col-6 main-content">
 					<div class="md-form">
 						<input type="text" id="search" class="form-control">
 						<label for="search">Поиск</label>
-					</div>
-				</div>
-				<div class="col-4">
-					<div class="md-form">
-						<button type="button" class="btn btn-light-blue" onclick="window.open( window.location.origin + '/view_doc.html?mode=eplans_edit')">Добавить</button>
 					</div>
 				</div>
 			</div>

@@ -1,4 +1,4 @@
-﻿<%
+<%
 	Request.Execute('portal/bs/portal_bootstrap/execute/init_app.html');
 	init_globals('/portal/bs/portal_bootstrap/ep_new/editor/');
 %>
@@ -11,36 +11,24 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <style>
 
+	.btn { width: 100%; }
+	.card-body { text-align: center; }
+	.del-danger { background-color: rgba(251, 49, 49, 0.678)!important; }
+	.title h3 { padding: 1rem; }
+
 	.archived {
 		background-color: #666!important;
-		color: #fefefe
+		color: #FEFEFE
 	}
-
-	.btn {
-		width: 100%;
-	}
-
-    .del-danger {
-		background-color: rgba(251, 49, 49, 0.678)!important;
-	}
-
-	.card {
-		border-radius: 0!important;
-	}
-
+	
 	.card-style {
 		padding: 1rem; margin-bottom: 1rem;
 		cursor: pointer;
 	}
-
 	.card-style:hover {
-		background-color: #BFA2C1;
-		color: #fff;
+		background-color: #EFB2FD;
+		color: #FFF;
 		transition: 0.3s;
-	}
-
-	.card-body {
-		text-align: center;
 	}
 
 	.title {
@@ -50,10 +38,6 @@
 		text-align: center;
 		text-transform: uppercase;
 		letter-spacing: 5px;
-	}
-
-	.title h3 {
-		padding: 1rem;
 	}
 
     </style>
@@ -66,24 +50,23 @@
 		$( document ).ready( function() {
 			var accessList = ObjectFromAPI(
 			{
-				object: 'wt_flat.dbo.education_plan'
-				,fields: 'id,name,tech_name,ISNULL( archived, 0 )__as__archived'
+				object: 'wt_flat.dbo.access'
+				,fields: 'id,name,ISNULL( archived, 0 )__as__archived'
 			});
-
 
 			for ( elem in accessList ) {
 				var element = $(h.d, {class: 'container filter ', id: accessList[elem].id}).append([
 					$(h.d, {class: 'row'}).append([
 						$(h.d, {class: 'col-12' }).append([
 							$(h.d, {class: 'card card-style '  + (accessList[elem].archived==0 ? '' : 'archived')}).append([
-								,$(h.d, {text: (accessList[elem].archived==0 ? '' : '(АРХИВ) ') + accessList[elem].name + ' [ ' + accessList[elem].tech_name+ ' ]'})])
+								,$(h.d, {text: (accessList[elem].archived==0 ? '' : '(АРХИВ) ') + accessList[elem].name})])
 							])
 						])
 					])
 
-				elems.push( {data: {name: accessList[elem].name,tech_name:accessList[elem].tech_name}, elem: element} )
+				elems.push( {data: {name: accessList[elem].name}, elem: element} )
 				element[0].onclick = function() {
-					window.open( window.location.origin + '/view_doc.html?mode=eplans_edit&epid='+ this.id);
+					window.open( window.location.origin + '/view_doc.html?mode=eplans_access_edit&acid='+ this.id);
 				}
 				$( '#ModelInstance' ).append(element);
 			}
@@ -100,7 +83,6 @@
 				for ( elem in elems ) {
 					if (
 						elems[elem].data.name.toLowerCase().indexOf( this.value.toLowerCase() ) != -1
-						|| elems[elem].data.tech_name.toLowerCase().indexOf( this.value.toLowerCase() ) != -1
 					) {
 						elems[elem].elem.fadeIn();
 						elems[elem].elem.addClass( 'filtered' );
@@ -120,7 +102,7 @@
 <body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
 	<div class="card">
 		<div class="title">
-			<h3>Список планов для редактирования</h3>
+			<h3>Список доступов</h3>
 		</div>
 		<div class="container">
 			<div class="row">
@@ -132,12 +114,12 @@
 				</div>
 				<div class="col-4">
 					<div class="md-form">
-						<button type="button" class="btn btn-light-blue" onclick="window.open( window.location.origin + '/view_doc.html?mode=eplans_edit')">Добавить</button>
+						<button type="button" class="btn btn-info" onclick="window.open( window.location.origin + '/view_doc.html?mode=eplans_edit')">Добавить</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div id='ModelInstance' class="card-body">
+			<div id='ModelInstance' class="card-body">
 		</div>
 	</div>
 </body>

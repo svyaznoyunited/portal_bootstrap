@@ -12,17 +12,17 @@
     <style>
 
 	a:visited { color: #007bff; }
-	
+
 	.tab-pane { margin-top: 0.7rem; }
 
 	.del-danger { background-color: rgba(251, 49, 49, 0.678)!important; }
 
 	.tab-pane { padding: 1rem; }
 
+	.card { border-radius: 0!important; }
+
 	.tab-content>.tab-pane {
-		background-color: #A290BE;
 		text-align: center;
-		color: #fff;
 		margin-bottom: 2rem;
 		margin-top: 3rem;
 	}
@@ -48,8 +48,15 @@
 		-ms-animation: fadeIn ease 2s;
 	}
 
+	.main-content {
+		background-color: #F7D8CD;
+		padding: 2rem;
+		margin-bottom: 2rem;
+		box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
+	}
+
 	#step-name {
-		background-color: #ffd4e0;
+		background-color: #FFD4E0;
 		margin-top: 1.5rem;
 		padding: 3.4rem;
 		text-align: center;
@@ -59,6 +66,7 @@
 		-o-animation: fadeIn ease 2s;
 		-ms-animation: fadeIn ease 2s;
 	}
+
 	#myTab { margin-top: 1.5rem; }
 
     </style>
@@ -66,7 +74,7 @@
 	<%=init_local_static({js: ['js/funcs.js', 'js/rf.js', 'js/consts.js']})%>
 	<script>
 		var MODEL;
-		var eplanId = "<%=Request.Query.GetOptProperty( 'epid', '4655AEC0-6E72-4D25-9742-9944559ADB7F' )%>";
+		var eplanId = "<%=Request.Query.GetOptProperty( 'resid', '4655AEC0-6E72-4D25-9742-9944559ADB7F' )%>";
         $(document).ready( function() {
 			if ( eplanId != 0 ) {
 				eplanData = ObjectFromAPI({
@@ -95,21 +103,26 @@
 						,"data-toggle": "tab"
 						,"href": '#' + eplanData.steps[step].step.id
 						,"role": "tab"
-						,"onclick" : "uiTabs(0)"
 						,"aria-controls": eplanData.steps[step].step.id
-						,"text": eplanData.steps[step].step.name})					
+						,"text": eplanData.steps[step].step.name})
 				).appendTo('#myTab')
 
 				var currentStepCnt = $(h.d, { "class": "main" }).appendTo(".col-md-6 mb-6");
 				var learnings = [];
+				var LearnName;
 				for ( l in eplanData.steps[step].learnings ) {
+					LearnName = ObjectFromAPI({
+						object: eplanData.steps[step].learnings[l].education_type
+						,fields: (eplanData.steps[step].learnings[l].education_type == 'assessment' ? 'title__as__name' : 'name')
+						,filter: toUrlStr( ['id = ' + eplanData.steps[step].learnings[l].education_id] )
+					})[0].name;
 					learnings.push(
-						$(h.d, { 'text': eplanData.steps[step].learnings[l].id })
+						$(h.d, { "class": "main-content", 'text': LearnName })
 					)
 				}
 
-				currentStepCnt.append($(h.d, { 
-					"class": "card tab-pane fade show"
+				currentStepCnt.append($(h.d, {
+					"class": "tab-pane fade show"
 					,"id": eplanData.steps[step].step.id
 					,"role": "tabpanel"
 					,"aria-labelledby": eplanData.steps[step].step.id
@@ -120,7 +133,7 @@
 			}
 
 		});
-		
+
     </script>
 </head>
 <body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
