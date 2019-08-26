@@ -116,9 +116,18 @@
 						,fields: (eplanData.steps[step].learnings[l].education_type == 'assessment' ? 'title__as__name' : 'name')
 						,filter: toUrlStr( ['id = ' + eplanData.steps[step].learnings[l].education_id] )
 					})[0].name;
-					learnings.push(
-						$(h.d, { "class": "main-content", 'text': LearnName })
-					)
+
+					let learnRow = $(h.d, { 
+						"id": eplanData.steps[step].learnings[l].education_id
+						,"class": "main-content"
+						,'text': LearnName
+					});
+					learnRow.attr('data-type', eplanData.steps[step].learnings[l].education_type);
+					learnRow[0].onclick = function() {
+						window.open( window.location.origin + '/view_doc.html?mode='+ this.dataset.type + '&object_id=' + this.id )
+					}
+
+					learnings.push( learnRow );
 				}
 
 				currentStepCnt.append($(h.d, {
