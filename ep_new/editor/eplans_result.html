@@ -13,8 +13,6 @@
 
 	a:visited { color: #007bff; }
 
-	.tab-pane { margin-top: 0.7rem; }
-
 	.del-danger { background-color: rgba(251, 49, 49, 0.678)!important; }
 
 	.tab-pane { padding: 1rem; }
@@ -22,9 +20,8 @@
 	.card { border-radius: 0!important; }
 
 	.tab-content>.tab-pane {
-		text-align: center;
 		margin-bottom: 2rem;
-		margin-top: 3rem;
+		margin-top: 1rem;
 	}
 
 	.title {
@@ -49,14 +46,29 @@
 	}
 
 	.main-content {
-		background-color: #F7D8CD;
-		padding: 2rem;
+		background-color: #F5FFFA;
+		cursor: pointer;
+		font-size: 0.9rem;
+		padding: 1rem;
 		margin-bottom: 2rem;
 		box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
 	}
 
+	.date-content {
+		background-color: #F5FFFA;
+		padding: 1rem;
+		font-size: 1.2rem;
+		box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
+		padding-bottom: 0.5rem;
+		border-bottom: 2px solid #cf8bf3;
+	}
+	
+	.imgClock {
+		width: 23px;
+	}
+
 	#step-name {
-		background-color: #FFD4E0;
+		background-color: #94F0F1;
 		margin-top: 1.5rem;
 		padding: 3.4rem;
 		text-align: center;
@@ -67,12 +79,13 @@
 		-ms-animation: fadeIn ease 2s;
 	}
 
-	#myTab { margin-top: 1.5rem; }
+	#stages { margin-top: 1.5rem; }
 
     </style>
 	<%=init_static([ jq, ajm, bs, mdb, bss])%>
 	<%=init_local_static({js: ['js/funcs.js', 'js/rf.js', 'js/consts.js']})%>
 	<script>
+		var MONTHS = ["января", "февраля", "марта", "апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 		var MODEL;
 		var eplanId = "<%=Request.Query.GetOptProperty( 'resid', '4655AEC0-6E72-4D25-9742-9944559ADB7F' )%>";
         $(document).ready( function() {
@@ -83,11 +96,11 @@
 				});
 			}
 
-			($(h.h3, { "text": eplanData.plan.name })).appendTo(".title");
+			$(h.h3, { "text": eplanData.plan.name }).appendTo(".title");
+			$(h.div, { "css": "background-color: red" }).appendTo(".title");
 
 			var tabsList = $(h.d, { "class": "col-md-12 mb-12", "id" : "tabs" }).append(
-				$(h.ul, { "class": c.navTabs, "id": "myTab", "role": "tablist" }).append(
-				));
+				$(h.ul, { "class": c.navTabs, "id": "stages", "role": "tablist" }));
 			var contentList = [];
 
 			tabsList.appendTo('#main');
@@ -105,29 +118,53 @@
 						,"role": "tab"
 						,"aria-controls": eplanData.steps[step].step.id
 						,"text": eplanData.steps[step].step.name})
-				).appendTo('#myTab')
+				).appendTo('#stages');
 
 				var currentStepCnt = $(h.d, { "class": "main" }).appendTo(".col-md-6 mb-6");
 				var learnings = [];
 				var LearnName;
+
 				for ( l in eplanData.steps[step].learnings ) {
 					LearnName = ObjectFromAPI({
 						object: eplanData.steps[step].learnings[l].education_type
 						,fields: (eplanData.steps[step].learnings[l].education_type == 'assessment' ? 'title__as__name' : 'name')
 						,filter: toUrlStr( ['id = ' + eplanData.steps[step].learnings[l].education_id] )
 					})[0].name;
+					
+					var date = new Date(eplanData.steps[step].learnings[l].expire_date);
+					var colorID = eplanData.plan.current_state;
+					var Month = MONTHS[ date.getMonth() ];
+					var Minutes = (date.getMinutes() < 10) ? "0"+date.getMinutes() : date.getMinutes();
+					var sDate = ' Пройти до: ';
+					sDate += date.getDate() + ' ';
+					sDate += Month + ' ';
+					sDate += date.getFullYear() + ' года, ';
+					sDate += date.getHours() + ':';
+					sDate += Minutes;
 
 					let learnRow = $(h.d, { 
 						"id": eplanData.steps[step].learnings[l].education_id
-						,"class": "main-content"
-						,'text': LearnName
+						,"class": "date-content"
+						,'text':  sDate
 					});
-					learnRow.attr('data-type', eplanData.steps[step].learnings[l].education_type);
-					learnRow[0].onclick = function() {
+					let dateRow = $(h.d, { 
+						"id": eplanData.steps[step].learnings[l].education_id
+						,"class": "main-content"
+						,'text':  LearnName
+					});
+					dateRow.attr('data-type', eplanData.steps[step].learnings[l].education_type);
+					var addictStyle = (eplanData.steps[step].learnings[l].state == 1) ? '' : 'disabled';
+					function addColor() {
+						
+					}
+					dateRow[0].onclick = function() {
 						window.open( window.location.origin + '/view_doc.html?mode='+ this.dataset.type + '&object_id=' + this.id )
 					}
 
 					learnings.push( learnRow );
+					learnings.push( dateRow );
+					$("#stages").children().first().children().first().addClass('active show');
+					$(".tab-content").children().first().addClass('active show');
 				}
 
 				currentStepCnt.append($(h.d, {
@@ -140,7 +177,7 @@
 				contentList.push( currentStepCnt )
 
 			}
-
+			console.log(eplanData.plan.current_state);
 		});
 
     </script>

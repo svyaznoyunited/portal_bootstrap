@@ -34,7 +34,7 @@ var __DEF_PROTOCOL__ = Request.Url.split('://')[0] + '://';
 var __USER__ = Request.AuthUserID;
 var __APPDIR__ = false;
 
-// ДЕФОЛТНЫ СТАТИКИ
+// ДЕФОЛТНЫE СТАТИКИ
 var jq = { name: 'jq', v: '340' };
 var jqui = { name: 'jqui', v: '1121' };
 var bs = { name: 'bs', v: '4' };
@@ -44,6 +44,7 @@ var bss = { name: 'bss', v: '1139' };
 var ajm = { name: 'ajm', v: '0' };
 var sa = { name: 'sa', v: '0' };
 var au = { name: 'au', v: '0' };
+var mvvm = { name: 'mvvm', v: '0' };
 
 var STATIC = {
     'jq': {
@@ -92,6 +93,10 @@ var STATIC = {
 		'0':[
 			'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/auth.js"></script>'
 		]
+	},'mvvm': {
+		'0':[
+			'<script type="text/javascript" src="' + __DEF_PROTOCOL__ + __HOST__ + '/portal/bs/portal_bootstrap/scripts/mvvm/main.js"></script>'
+		]
 	}
   }
 
@@ -107,7 +112,7 @@ function init_globals( string )  {
 
 function init_local_static( object ) {
 	if ( __APPDIR__ == false ) {
-		return "<script> console.error('Для рендера локальной статики зарегистрируй путь приложения используя метод init_globals( путь/до/корневой/папки/приложения/ )') </script>";
+		return "<script> console.error('Для рендера локальной статики зарегистрируй путь приложения используя метод init_globals( /путь/до/корневой/папки/приложения/ )') </script>";
 	}
 	var s = "";
 	if ( object.HasProperty('css') ) {

@@ -234,15 +234,15 @@
 
         function EPModel( obj ) {
           var self = this;
-					this.saved = obj.saved;
-					this.new = obj.plan.id ? false : true;
+			this.saved = obj.saved;
+			this.new = obj.plan.id ? false : true;
 
-					this.data = {};
+			this.data = {};
           this.data.id = obj.plan.id ? obj.plan.id : ObjectFromAPI( {'$': 'tools.get.newid'} ).ID;
           this.data.name = obj.plan.name;
           this.data.tech_name = obj.plan.tech_name;
 					this.data.access = obj.plan.access;
-          this.data.archived = obj.plan.archived;
+          this.data.archived = ( obj.plan.archived ) ? obj.plan.archived : 0 ;
 					this.data.expired_time = obj.plan.expired_time;
 
           this.steps = [];
@@ -322,8 +322,12 @@
 							if ( this.new ) {
 								method = 'eplans.new.ep';
 							}
-							print( 'План пойдёт по методу ' + method )
-							ObjectFromAPI( { "$": method, data: toUrlStr( this.data ) } );
+							if (ObjectFromAPI( { "$": method, data: toUrlStr( this.data ) } ).err) {
+								alert('Вы не заполнили план!');
+								return false;
+							} else {
+								alert('Сохранено!');
+							}
 							this.saved = true;
 							this.new = false;
 						}
@@ -331,7 +335,8 @@
 						for ( step in this.steps ) {
 							this.steps[step].save()
 						}
-						alert( 'Сохранено!' )
+
+						
 					}
 					window.onkeydown = function(e) {
 						if ( e.code == 'KeyS' && e.ctrlKey ) {

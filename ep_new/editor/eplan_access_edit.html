@@ -30,23 +30,22 @@
 					this.data = {};
           this.data.id = obj.id ? obj.id: ObjectFromAPI( {'$': 'tools.get.newid'} ).ID;
           this.data.access_id = parent.data.id;
-					this.data.archived = obj.archived;
-
-					this.data.archived = 0;
-
-					this.data.catalog_id = obj.catalog_id;
-          this.data.field_id = obj.field_id;
-					this.data.operator_id = obj.operator_id;
-					this.data.value = obj.value;
+		  this.data.archived = ( obj.archived ) ? obj.archived : 0 ;
 
 
-					this.dataFields = {};
+		this.data.catalog_id = obj.catalog_id;
+		this.data.field_id = obj.field_id;
+		this.data.operator_id = obj.operator_id;
+		this.data.value = obj.value;
 
-					this.dataFields.field = InputSelectRF( this, 'field_id', 'access-rule-fld-'+this.data.id, ObjectFromAPI({
-							object: 'wt_flat.dbo.access_catalog_fields'
-							,fields: 'id__as__val,user_name__as__name'
-							,filter: toUrlStr( ["catalog_id = '" + self.data.catalog_id + "'"] )
-					}));
+
+		this.dataFields = {};
+
+		this.dataFields.field = InputSelectRF( this, 'field_id', 'access-rule-fld-'+this.data.id, ObjectFromAPI({
+			object: 'wt_flat.dbo.access_catalog_fields'
+			,fields: 'id__as__val,user_name__as__name'
+			,filter: toUrlStr( ["catalog_id = '" + self.data.catalog_id + "'"] )
+		}));
 
 					this.dataFields.catalog = InputSelectRF( this, 'catalog_id', 'access-rule-ctlg'+this.data.id, ObjectFromAPI({
 							object: 'wt_flat.dbo.access_catalogs'
@@ -121,7 +120,7 @@
 
           this.data.id = obj.access.id ? obj.access.id : ObjectFromAPI( {'$': 'tools.get.newid'} ).ID;
           this.data.name = obj.access.name;
-          this.data.archived = obj.access.archived;
+          this.data.archived = ( obj.access.archived ) ? obj.access.archived : 0 ;
 
           this.rules = [];
 					this.dataFields = {};
@@ -182,7 +181,12 @@
 							if ( this.new ) {
 								method = 'access.new.self';
 							}
-							ObjectFromAPI( { "$": method, data: toUrlStr( this.data ) } );
+							if ( ObjectFromAPI( { "$": method, data: toUrlStr( this.data ) } ).err ) {
+								alert('Вы не заполнили план!');
+								return false;
+							} else {
+								alert('Сохранено!');
+							}
 							this.saved = true;
 							this.new = false;
 						}
@@ -190,7 +194,6 @@
 						for ( rule in this.rules ) {
 							this.rules[rule].save()
 						}
-						alert( 'Сохранено!' )
 					}
 					window.onkeydown = function(e) {
 						if ( e.code == 'KeyS' && e.ctrlKey ) {

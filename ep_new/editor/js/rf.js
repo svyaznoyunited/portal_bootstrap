@@ -1,5 +1,6 @@
 function InputSelectRF( Model, field, id, options=[], onchange=function(){ /*pass*/ } ) {
   var sp = $( h.sp, { 'id': id,'class': c.spr, 'data-live-search': 'true', 'data-width': '100%' } );
+  sp.append( $(h.o, { 'value': 0, 'text': 'Выберите из списка', 'selected': true, 'disabled': true }))
   for ( o in options ) {
     sp.append( $(h.o, { 'value': options[o].val, 'text': options[o].name  }) );
   }
@@ -13,6 +14,7 @@ function InputSelectRF( Model, field, id, options=[], onchange=function(){ /*pas
 }
 function SPUpdate( spInstance, newData ) {
   spInstance.html( '' );
+  spInstance.append( $(h.o, { 'value': 0, 'text': 'Выберите из списка', 'selected': true, 'disabled': true }))
   for ( o in newData ) {
     spInstance.append( $(h.o, { 'value': newData[o].val, 'text': newData[o].name  }) );
   }

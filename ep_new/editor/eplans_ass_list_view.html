@@ -55,25 +55,27 @@
 		var elems = [];
 
 		$( document ).ready( function() {
-			var accessList = ObjectFromAPI(
-			{
-				'$': 'eplans.get.result_list'
-			});
+			var plansList = ObjectFromAPI({'$': 'eplans.get.available_plans'})
 
 
-			for ( elem in accessList ) {
-				var element = $(h.d, {class: 'container filter ', id: accessList[elem].id}).append([
+			for ( elem in plansList ) {
+				var element = $(h.d, {class: 'container filter ', id: plansList[elem].id}).append([
 					$(h.d, {class: 'row'}).append([
 						$(h.d, {class: 'col-6 main-content' }).append([
 							$(h.d, {class: 'card card-style'}).append([
-								,$(h.d, {text: accessList[elem].name + ' Пройти до: ' + accessList[elem].expire_date.replace('T', ', ').replace('+00:00', '')})])
+								,$(h.d, {text: plansList[elem].name + ', время на прохождение ' + plansList[elem].expired_time + ' ч.'})])
 							])
 						])
-					])
+					]);
 
-				elems.push( {data: {name: accessList[elem].name,tech_name:accessList[elem].tech_name}, elem: element} )
+				elems.push( {data: {name: plansList[elem].name,tech_name:plansList[elem].tech_name}, elem: element} )
 				element[0].onclick = function() {
-					window.open( window.location.origin + '/view_doc.html?mode=eplans_result&resid='+ this.id);
+					var newPlan = ObjectFromAPI({ '$': 'eplans.new.epres','planid': this.id });
+					if ( !newPlan.err ) {
+						window.open( window.location.origin + '/view_doc.html?mode=eplans_list_view' );
+					} else {
+						alert( newPlan.desc )
+					}
 				}
 				$( '#ModelInstance' ).append(element);
 			}
@@ -110,7 +112,7 @@
 <body style="background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b);">
 	<div class="card">
         <div class="title">
-            <h3>Назначенные планы</h3>
+            <h3>Доступные планы</h3>
         </div>
 		<div class="container">
 			<div class="row">
