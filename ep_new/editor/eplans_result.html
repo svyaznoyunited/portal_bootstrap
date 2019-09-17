@@ -19,6 +19,12 @@
 
 	.card { border-radius: 0!important; }
 
+	.title h3 { padding: 1rem; }
+
+	.imgClock {
+		width: 23px;
+	}
+
 	.tab-content>.tab-pane {
 		margin-bottom: 2rem;
 		margin-top: 1rem;
@@ -29,12 +35,7 @@
 		margin-bottom: 3rem;
 		background-color: #BAE2EE;
 		text-align: center;
-		text-transform: uppercase;
 		letter-spacing: 5px;
-	}
-
-	.title h3 {
-		padding: 1rem;
 	}
 
 	.tab-content>.tab-pane {
@@ -48,24 +49,34 @@
 	.main-content {
 		background-color: #F5FFFA;
 		cursor: pointer;
-		font-size: 0.9rem;
+		text-transform: uppercase;
 		padding: 1rem;
 		margin-bottom: 2rem;
 		box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
 	}
 
 	.date-content {
-		background-color: #F5FFFA;
 		padding: 1rem;
 		font-size: 1.2rem;
 		box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
 		padding-bottom: 0.5rem;
 		border-bottom: 2px solid #cf8bf3;
 	}
-	
-	.imgClock {
-		width: 23px;
-	}
+
+	.learn-fail {
+		background-color: #FF6969!important;
+		cursor: default;
+		}
+
+	.learn-timeout {
+		background-color: #FF6969!important;
+		cursor: default;
+		}
+
+	.learn-success {
+		background-color: lightgreen!important;
+		cursor: default;
+		}
 
 	#step-name {
 		background-color: #94F0F1;
@@ -108,16 +119,18 @@
 
 			for ( step in eplanData.steps ) {
 
-				eplanData.steps[step].step.name
-
+				var linkClass = "nav-link";
+				linkClass += (parseInt( eplanData.steps[step].step.current_state ) > 6 ) ? ' disabled': '';
+				var sStatus = (parseInt( eplanData.steps[step].step.current_state ) > 6 ) ? ' — не пройдено': '';
 				$(h.li, { "class": "navItem" }).append(
 					$(h.a, {
-						"class": "nav-link"
+						"class": linkClass
 						,"data-toggle": "tab"
 						,"href": '#' + eplanData.steps[step].step.id
-						,"role": "tab"
+						,"role": "tab" 
 						,"aria-controls": eplanData.steps[step].step.id
-						,"text": eplanData.steps[step].step.name})
+						,"text": eplanData.steps[step].step.name + sStatus
+					})
 				).appendTo('#stages');
 
 				var currentStepCnt = $(h.d, { "class": "main" }).appendTo(".col-md-6 mb-6");
@@ -125,46 +138,79 @@
 				var LearnName;
 
 				for ( l in eplanData.steps[step].learnings ) {
+
+					var state = eplanData.steps[step].learnings[l].state;
+					var sLearnHeader, style;
 					LearnName = ObjectFromAPI({
 						object: eplanData.steps[step].learnings[l].education_type
 						,fields: (eplanData.steps[step].learnings[l].education_type == 'assessment' ? 'title__as__name' : 'name')
 						,filter: toUrlStr( ['id = ' + eplanData.steps[step].learnings[l].education_id] )
 					})[0].name;
-					
-					var date = new Date(eplanData.steps[step].learnings[l].expire_date);
-					var colorID = eplanData.plan.current_state;
-					var Month = MONTHS[ date.getMonth() ];
-					var Minutes = (date.getMinutes() < 10) ? "0"+date.getMinutes() : date.getMinutes();
-					var sDate = ' Пройти до: ';
-					sDate += date.getDate() + ' ';
-					sDate += Month + ' ';
-					sDate += date.getFullYear() + ' года, ';
-					sDate += date.getHours() + ':';
-					sDate += Minutes;
+
+					if (state < 7) {
+
+						var date = new Date(eplanData.steps[step].learnings[l].expire_date.replace('+00:00',''));
+						var colorID = eplanData.plan.current_state;
+						var Month = MONTHS[ date.getMonth() ];
+						var Minutes = (date.getMinutes() < 10) ? "0"+date.getMinutes() : date.getMinutes();
+						style = '';
+
+						sLearnHeader = ' Пройти до: ';
+						sLearnHeader += date.getDate() + ' ';
+						sLearnHeader += Month + ' ';
+						sLearnHeader += date.getFullYear() + ' года, ';
+						sLearnHeader += date.getHours() + ':';
+						sLearnHeader += Minutes;
+
+					} else {
+						switch( state ) {
+							case "7":
+								 sLearnHeader = 'Не пройдено!';
+								 style = 'learn-fail';
+								break;
+							case "8":
+								sLearnHeader = 'Просрочено!';
+								style = 'learn-timeout';
+								break;
+							case "9":
+								sLearnHeader ='Пройдено!';
+								style = 'learn-success';
+								break;
+						}
+					}
 
 					let learnRow = $(h.d, { 
 						"id": eplanData.steps[step].learnings[l].education_id
 						,"class": "date-content"
-						,'text':  sDate
+						,'text':  sLearnHeader
 					});
-					let dateRow = $(h.d, { 
+
+					let dataRow = $(h.d, {
 						"id": eplanData.steps[step].learnings[l].education_id
-						,"class": "main-content"
+						,"class": ( "main-content " + style )
 						,'text':  LearnName
 					});
-					dateRow.attr('data-type', eplanData.steps[step].learnings[l].education_type);
+
 					var addictStyle = (eplanData.steps[step].learnings[l].state == 1) ? '' : 'disabled';
-					function addColor() {
-						
-					}
-					dateRow[0].onclick = function() {
-						window.open( window.location.origin + '/view_doc.html?mode='+ this.dataset.type + '&object_id=' + this.id )
+					
+					if (state < 7) {
+						dataRow.attr('data-type', eplanData.steps[step].learnings[l].education_type);
+						dataRow[0].onclick = function() {
+							window.open( window.location.origin + '/view_doc.html?mode='+ this.dataset.type + '&object_id=' + this.id )
+						}
 					}
 
 					learnings.push( learnRow );
-					learnings.push( dateRow );
-					$("#stages").children().first().children().first().addClass('active show');
-					$(".tab-content").children().first().addClass('active show');
+					learnings.push( dataRow );
+
+					var firstTab = $("#stages").children().first().children().first();
+
+					if ( !firstTab.hasClass('disabled')  ){
+						$("#stages").children().first().children().first().addClass('active show');
+						$(".tab-content").children().first().addClass('active show');
+					}
+
+
 				}
 
 				currentStepCnt.append($(h.d, {
