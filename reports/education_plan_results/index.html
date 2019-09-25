@@ -1,0 +1,374 @@
+﻿<%
+	Request.Execute('\\portal\\bs\\portal_bootstrap\\execute\\init_app.html');
+%>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Отчет по планам обучения</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <!-- jQuery -->
+  <%=init_static([
+			{
+				name: 'jq'
+				,v: '340'
+			},{
+				name: 'jqui'
+				,v: '1121'
+			},{
+				name: 'bs'
+				,v: '4'
+			},{
+				name: 'dt'
+				,v: '11018'
+			},{
+				name: 'bss'
+				,v: '1139'
+			},{
+				name: 'ajm'
+				,v: '0'
+			}
+        ]);%>
+<script>
+function toUrlStr( obj ) {
+  strObj = '';
+  try {
+    strObj = JSON.stringify( obj );
+  } catch( errParseObjToUrlString ) {
+    strObj = JSON.stringify( { err: errParseObjToUrlString } );
+  }
+  return strObj;
+}
+function ObjectFromAPI( RequestData ) {
+  var response;
+  var dataToSend = {};
+  for ( elem in RequestData ) {
+    dataToSend[elem] = RequestData[elem];
+  }
+  $.ajax({
+    url: window.location.origin + '/api/v1/$.html'
+    ,method: 'GET'
+    ,async: false
+    ,contentType: 'application/json'
+    ,dataType: 'json'
+    ,data: dataToSend
+    ,success: function( data ) {
+      response = data;
+    }
+  });
+  return response;
+}
+</script>
+<script>
+    $(document).ready(function(){
+    var EPLANS = ObjectFromAPI( {'object': 'wt_flat.dbo.education_plan', fields: 'id,name,tech_name'} );
+      for (i in EPLANS) {
+        $('<option>', {value: EPLANS[i].id, text: EPLANS[i].name + ' [' + EPLANS[i].tech_name + ']' }).appendTo('#plans');
+      }
+
+      $('#submit').click(function() {
+        document.getElementById('submit').disabled = true;
+        $("#table").fadeOut(300);
+        getPlanResults(
+          $('#plans').val().join(',')
+          ,$('#dateFrom').val()
+          ,$('#dateTo').val()
+          ,$('#allowDissmissed')[0].checked
+        );
+      });
+
+      $("#div_table_container").mousemove(function(e) {
+      	let a = $('#div_table_container').width()/2;
+        let b = e.pageX;
+      	if (a - b > 0) {
+          $("#div_table_container").scrollLeft($("#div_table_container").scrollLeft() -10);
+          $("#div_table_container").css('cursor', 'e-resize');
+        } else if (a - b < 0) {
+          $("#div_table_container").scrollLeft($("#div_table_container").scrollLeft() + 10);
+          $("#div_table_container").css('cursor', 'e-resize');
+        }
+      });
+
+    });
+
+    $( function() {
+
+      let dateFormat = "dd-mm-yy";
+      let from = $( "#dateFrom" ).datepicker({
+          defaultDate: "+1w",
+          changeMonth: true,
+          changeYear: true,
+          numberOfMonths: 1,
+          dateFormat: "dd-mm-yy"
+        }).on( "change", function() {
+          to.datepicker( "option", "minDate", getDate( this ) );
+        });
+      let to = $( "#dateTo" ).datepicker({
+        defaultDate: "+1w",
+        changeMonth: true,
+        changeYear: true,
+        numberOfMonths: 1,
+        dateFormat: "dd-mm-yy"
+      }).on( "change", function() {
+        from.datepicker( "option", "maxDate", getDate( this ) );
+      });
+
+      function getDate( element ) {
+        let date;
+        try {
+          date = $.datepicker.parseDate( dateFormat, element.value );
+        } catch( error ) {
+          date = null;
+        }
+        return date;
+      }
+    });
+
+    function getPlanResults(planID, dateFrom, dateTo, allowDissmissed) {
+        console.log( arguments )
+      $('#table').dataTable().fnDestroy()
+      if ( !planID ||  !dateFrom ) {
+        document.getElementById('submit').disabled = false;
+        return false;
+      }
+
+      $('#table').DataTable({
+          "ajax" : {
+          "url": window.location.origin+"/api/v1/$.html?$=eplans.fn.reportable"
+          ,"method" : "GET"
+          ,"data": {
+              data: JSON.stringify({
+                    plan_ids : typeof planID == 'object' ? planID.join(',') : planID
+                    ,date_from: dateFrom
+                    ,date_to: dateTo
+                    ,allow_dis: allowDissmissed
+               })
+          }
+          ,dataSrc: ""
+        }
+        ,dom: 'Bfrtip'
+        ,buttons: [{
+                extend: 'excelHtml5',
+                title: `${dateFrom} - ${dateTo}`
+            }]
+        ,"columns": [
+          {data: "name"}
+          ,{data: "tech_name"}
+          ,{data: "fullname"}
+          ,{data: "tab_number"}
+          ,{data: "position_name"}
+          ,{data: "subdivision_name"}
+          ,{data: "subdivision_merch_id"}
+          ,{data: "state"}
+        ]
+      });
+      $("#table").fadeIn(300);
+      document.getElementById('submit').disabled = false;
+    }
+</script>
+<style>
+    body {
+        background: linear-gradient(to right, #a770ef, #cf8bf3, #fdb99b)
+    }
+    hr {
+        margin-top: 2rem;
+    }
+    input[type=search] {
+        border: 2px solid #BAE2EE;
+        border-radius: 3px;
+    }
+    div.dt-buttons {
+        position: relative;
+        float: right;
+        margin: 0 1rem 2rem;
+}
+    .btn-formulate {
+        position: relative;
+        float: right;
+        margin-top: 3rem;
+    }
+    .btn-send {
+        background-color: #BAE2EE;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border: none;
+        padding: 0.4rem 1rem 0.5rem;
+        margin-bottom: 2rem;
+    }
+    .btn-send:hover {
+        background-color: #D5EDF4;
+        transition: 0.8s;
+    }
+    .card {
+        border-radius: 0;
+        margin-top: 3%;
+    }
+    .date-block {
+        display: flex;
+        justify-content: center;
+    }
+    .date-from {
+        flex:  100px;
+        padding-right: 5px;
+    }
+    .date-to {
+        flex:  100px;
+        padding-left: 5px;
+    }
+    .date label {
+        margin-left: 10px;
+    }
+    .dropdown-menu {
+        transform: none!important;
+    }
+    .date-block {
+        margin-top: 2rem;
+    }
+    .title-header {
+        padding: 3rem;
+        background-color: #BAE2EE;
+        text-align: center;
+        letter-spacing: 5px;
+    }
+    .title-header h3 {
+        font-weight: 300;
+        text-transform: uppercase;
+        letter-spacing: 5px;
+        text-align: center;
+    }
+    .title-footer {
+        padding: 4.5rem;
+        background-color: #BAE2EE;
+        text-align: center;
+        letter-spacing: 5px;
+    }
+    .select-plans {
+        width: 31%;
+        margin: 2rem auto;
+    }
+    .select-plans label {
+       font-weight: bold;
+    }
+
+    .fired-employees {
+        margin-top: 2rem;
+    }
+    .fired-employees {
+        display: block;
+        position: relative;
+        padding-left: 25px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        }
+    .fired-employees input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+        }
+    .checkmark {
+        position: absolute;
+        top: 5px;
+        left: 0;
+        height: 15px;
+        width: 15px;
+        background-color: #eee;
+    }
+    .fired-employees:hover input ~ .checkmark {
+        background-color: #ccc;
+    }
+    .fired-employees input:checked ~ .checkmark {
+        background-color: #BAE2EE;
+        }
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+    .fired-employees input:checked ~ .checkmark:after {
+        display: block;
+    }
+    .fired-employees .checkmark:after {
+        left: 5px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+        cursor: default;
+        color: #333 !important;
+        border: none;
+        background: #BAE2EE;
+        box-shadow: none;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+        color: #333 !important;
+        background-color: #fff;
+    }
+</style>
+</head>
+<body>
+    <div class="card">
+        <div class="title-header">
+            <h3>Отчет по планам обучения</h3>
+        </div>
+        <div id="ModelInstance" class="card-body">
+            <div class="select-plans">
+                <label>Планы обучения:</label>
+                <select class="selectpicker" data-live-search="true" id="plans" multiple>
+                    <option disabled value='0'>Выберите из списка</option>
+                </select>
+                <label class="fired-employees">
+                    <input type="checkbox" class="form-check-input" id="allowDissmissed" />
+                    <span class="checkmark"></span>
+                    <span>Учитывать уволенных сотрудников</span>
+                </label>
+                <hr />
+                <div class="date-block">
+                    <div class="date-from">
+                        <label for="dateFrom">Дата с:</label>
+                        <input type="text" class="form-control cross" id="dateFrom" placeholder="Дата с">
+                    </div>
+                    <div class="date-to">
+                        <label for="dateTo">По:</label>
+                        <input type="text" class="form-control cross" id="dateTo" placeholder="По">
+                    </div>
+                </div>
+                <div class="btn-formulate">
+                    <button type="button" class="btn-send" id="submit">Сформировать</button>
+                </div>
+            </div>
+            <div class="form-group col-sm-12" id="div_table_container" style="overflow-x: hidden;">
+                <table class="table" id="table">
+                    <thead>
+                        <tr id="table_head">
+                            <th>Название</th>
+                            <th>Тех. название</th>
+                            <th>Ф.И.О</th>
+                            <th>Табельный номер</th>
+                            <th>Должность</th>
+                            <th>Подразделение</th>
+                            <th>Код ТТ</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <div class="title-footer" />
+    </div>
+</body>
+<script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/validator.min.js?<%=ac%>" async='false'></script>
+<script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/form-scripts.js?<%=ac%>" async='false'></script>
+</html>

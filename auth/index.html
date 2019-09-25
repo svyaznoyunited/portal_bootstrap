@@ -1,0 +1,19 @@
+<%
+    //http://10.2.16.254:8080/portal/bs/portal_bootstrap/auth/index.html?service_num=27735271
+    var tab_num = Request.Query.GetOptProperty('service_num', '');
+    var SQL = "sql: ";
+    SQL += "SELECT CAST( cs.id AS VARCHAR(30) ) AS id, cs.login, cs.is_dismiss " ;
+    SQL += "FROM wt_flat.dbo.wt_x_sap_org_delta d ";
+    SQL += "JOIN collaborators cs ON d.id = cs.id ";
+    SQL += "WHERE tab_number = ";
+    SQL += SqlLiteral( tab_num );
+    
+    var RES = XQuery( SQL );
+    var feRES = ArrayOptFirstElem( RES );
+    if ( ArrayCount( RES ) > 0 && StrLen( feRES.login ) > 0 && feRES.is_dismiss != true ) {
+        Request.Session.mobile_app_login = String( feRES.login );
+        Request.Session.mobile_app_access = !feRES.is_dismiss;
+        Request.Redirect("/view_doc.html?mode=home");
+    }
+
+%>

@@ -42,7 +42,6 @@
 		]);%>
     <!-- DataTables -->
     <!-- Other scripts -->
-    <script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/jszip.min.js?<%=ac%>"></script>
     <script>
     var Orgs = <%=tools.object_to_text(Orgs, 'json')%>;
     var Learnings = <%=tools.object_to_text(Learnings, 'json')%>;
@@ -126,7 +125,7 @@
 
       $('#table').DataTable({
           "ajax" : {
-          "url": "http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/reports/event_results/get_event_results.html"
+          "url": window.location.origin+"/portal/bs/portal_bootstrap/reports/event_results/get_event_results.html"
           ,"method" : "POST"
           ,"data": {
             "event_id" : eventId
@@ -218,19 +217,19 @@
             </div>
             <div class="form-group col-sm-12" ID="div_table_container" style="overflow-x: hidden;">
                 <table class="table" id="table">
-                    <thead>
-                      <tr id="table_head">
-                        <th>Обучение</th>
-                        <th>Окончено</th>
-                        <th>Тренер</th>
-                        <th>Табельный номер</th>
-                        <th>ФИО</th>
-                        <th>Должность</th>
-                        <th>Подразделение</th>
-                        <th>Код ТТ</th>
-                        <th>Присутствовал</th>
-                      </tr>
-                    </thead>
+                  <thead>
+                    <tr id="table_head">
+                      <th>Обучение</th>
+                      <th>Окончено</th>
+                      <th>Тренер</th>
+                      <th>Табельный номер</th>
+                      <th>ФИО</th>
+                      <th>Должность</th>
+                      <th>Подразделение</th>
+                      <th>Код ТТ</th>
+                      <th>Присутствовал</th>
+                    </tr>
+                  </thead>
                 </table>
             </div>
         </div>
@@ -265,7 +264,7 @@
         });;
       }
 
-document.addEventListener('mousemove', parallax);
+    document.addEventListener('mousemove', parallax);
 
     });
 

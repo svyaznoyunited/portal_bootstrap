@@ -16,7 +16,7 @@
 	.operation { margin-bottom: 3rem; }
 
 	.card { border-radius: 0!important; }
-	
+
     .del-danger { background-color: rgba(251, 49, 49, 0.678)!important; }
 
 	.container {
@@ -33,7 +33,7 @@
 		text-transform: uppercase;
 		letter-spacing: 5px;
 	}
-	
+
     </style>
 	<%=init_static([ jq, ajm, bs, mdb, bss])%>
 	<%=init_local_static({js: ['js/funcs.js', 'js/rf.js', 'js/consts.js']})%>
@@ -70,9 +70,10 @@
 					));
 
 					this.dataFields.edu_type = InputSelectRF( this, 'education_type', 'plan-step-'+this.parent.index+'-learning-type-'+this.index, [
-						{val: 'course', name: 'Курс' }
-						,{val: 'assessment', name: 'Тест' }
-						,{val: 'poll', name: 'Опрос' }
+						{ val: 'course', name: 'Курс' }
+						,{ val: 'assessment', name: 'Тест' }
+						,{ val: 'poll', name: 'Опрос' }
+						,{ val: 'education_method', name: 'Мероприятие' }
 					], function() {
 						SPUpdate( self.dataFields.edu_id, ObjectFromAPI(
 							{
@@ -336,7 +337,7 @@
 							this.steps[step].save()
 						}
 
-						
+
 					}
 					window.onkeydown = function(e) {
 						if ( e.code == 'KeyS' && e.ctrlKey ) {

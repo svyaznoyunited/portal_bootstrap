@@ -23,6 +23,8 @@
 
     .main-content { margin: 0 auto; }
 
+	.neutral { background-color: #B0E0E6!important; }
+
     .archived {
 		background-color: #666!important;
 		color: #fefefe
@@ -47,6 +49,33 @@
 		letter-spacing: 5px;
 	}
 
+	.good {
+		background-color: #5EDA9F!important;
+		color: #fff;
+		pointer-events: none;
+		cursor: pointer;
+	}
+
+	.temporarily-closed {
+		background-color: #909090;
+		pointer-events: none;
+		cursor: default;
+	}
+
+	.error {
+		background-color: #dc143c!important;
+		color: #fff;
+		pointer-events: none;
+		cursor: default;
+	}
+
+	.expired {
+		background-color: #ff6347!important;
+		color: #fff;
+		pointer-events: none;
+		cursor: default;
+	}
+
     </style>
 	<%=init_static([ jq, bs, mdb, ajm, bss])%>
 	<%=init_local_static({js: ['js/funcs.js', 'js/rf.js', 'js/consts.js']})%>
@@ -60,16 +89,74 @@
 				'$': 'eplans.get.result_list'
 			});
 
-
 			for ( elem in accessList ) {
-				var element = $(h.d, {class: 'container filter ', id: accessList[elem].id}).append([
-					$(h.d, {class: 'row'}).append([
-						$(h.d, {class: 'col-6 main-content' }).append([
-							$(h.d, {class: 'card card-style'}).append([
-								,$(h.d, {text: accessList[elem].name + ' Пройти до: ' + accessList[elem].expire_date.replace('T', ', ').replace('+00:00', '')})])
+				var style = '';
+				var onclick = '';
+				var warning = '';
+				if (accessList[elem].current_state > '') {
+					switch( accessList[elem].current_state ) {
+						case "0":
+							style = 'temporarily-closed';
+							onclick = 'event.stopPropagation()';
+							var element = $(h.d, {class: 'container filter ', id: accessList[elem].id}).append([
+								$(h.d, {class: 'row'}).append([
+									$(h.d, {onclick, class: 'col-6 main-content' }).append([
+										$(h.d, {class: 'card card-style' + ' ' + style}).append([
+											,$(h.d, {text: 'Временно закрыто!'})])
+										])
+									])
+								])
+							break;
+						case "1": {
+							style = 'good';
+							var element = $(h.d, {class: 'container filter ', id: accessList[elem].id}).append([
+							$(h.d, {class: 'row'}).append([
+								$(h.d, {onclick, class: 'col-6 main-content' }).append([
+									$(h.d, {class: 'card card-style' + ' ' + style}).append([
+										,$(h.d, {text: accessList[elem].name + ' Пройти до: ' + accessList[elem].expire_date.replace('T', ', ').replace('+00:00', '')})])
+									])
+								])
 							])
-						])
-					])
+						}
+							break;
+						case "7":
+							style = 'error';
+							onclick = 'event.stopPropagation()';
+							var element = $(h.d, {class: 'container filter ', id: accessList[elem].id}).append([
+								$(h.d, {class: 'row'}).append([
+									$(h.d, {onclick, class: 'col-6 main-content' }).append([
+										$(h.d, {class: 'card card-style' + ' ' + style}).append([
+											,$(h.d, {text: 'Неуспешно!'})])
+										])
+									])
+								])
+							break;
+						case "8":
+							style = 'expired';
+							onclick = 'event.stopPropagation()';
+							var element = $(h.d, {class: 'container filter ', id: accessList[elem].id}).append([
+								$(h.d, {class: 'row'}).append([
+									$(h.d, {onclick, class: 'col-6 main-content' }).append([
+										$(h.d, {class: 'card card-style' + ' ' + style}).append([
+											,$(h.d, {text: 'Просрочено!'})])
+										])
+									])
+								])
+							break;
+						case "9":
+							style = 'neutral';
+							onclick = 'event.stopPropagation()';
+							var element = $(h.d, {class: 'container filter ', id: accessList[elem].id}).append([
+								$(h.d, {class: 'row'}).append([
+									$(h.d, {onclick, class: 'col-6 main-content' }).append([
+										$(h.d, {class: 'card card-style' + ' ' + style}).append([
+											,$(h.d, {text: 'Завершено успешно!'})])
+										])
+									])
+								])
+							break;
+					}
+				}
 
 				elems.push( {data: {name: accessList[elem].name,tech_name:accessList[elem].tech_name}, elem: element} )
 				element[0].onclick = function() {
@@ -125,5 +212,37 @@
 		<div id='ModelInstance' class="card-body">
 		</div>
 	</div>
+<script>
+function showCurrentDate()  {
+    var d = new Date(),
+    new_value=d.toISOString().slice(0,10);
+    document.getElementById("dateFrom").value=new_value;
+}
+    showCurrentDate();
+
+    $(function(){
+	    var dtToday = new Date();
+
+        var month = dtToday.getMonth() + 1;
+        var day = dtToday.getDate();
+        var year = dtToday.getFullYear();
+        if (month < 10)
+            month = '0' + month.toString();
+        if (day < 10)
+            day = '0' + day.toString();
+
+      $('#dateTo').val(`${day}-${month.length > 1 ? month : '0' + month}-${year}`);
+      $('#dateFrom').val(`${day}-${month.length > 1 ? month : '0' + month}-${year}`);
+
+      function parallax(event) {
+        this.querySelectorAll('.layer').forEach(layer => {
+          layer.style.transform = `translateX(${event.clientX/50}px)`
+        });;
+      }
+
+	document.addEventListener('mousemove', parallax);
+
+    });
+</script>
 </body>
 </html>
