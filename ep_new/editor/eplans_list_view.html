@@ -145,12 +145,11 @@
 							break;
 						case "9":
 							style = 'neutral';
-							onclick = 'event.stopPropagation()';
 							var element = $(h.d, {class: 'container filter ', id: accessList[elem].id}).append([
 								$(h.d, {class: 'row'}).append([
 									$(h.d, {onclick, class: 'col-6 main-content' }).append([
 										$(h.d, {class: 'card card-style' + ' ' + style}).append([
-											,$(h.d, {text: 'Завершено успешно!'})])
+											,$(h.d, {text: accessList[elem].name + ' Пройти до: ' + accessList[elem].expire_date.replace('T', ', ').replace('+00:00', '')})])
 										])
 									])
 								])

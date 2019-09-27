@@ -40,8 +40,6 @@
 				,v: '0'
 			}
 		]);%>
-    <!-- DataTables -->
-    <!-- Other scripts -->
     <script>
     var Orgs = <%=tools.object_to_text(Orgs, 'json')%>;
     var Learnings = <%=tools.object_to_text(Learnings, 'json')%>;
@@ -162,7 +160,7 @@
 
     }
     #table {display: none;}
-    @font-face {font-family: 'SvyaznoySans'; src: url(http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/fonts/SvyaznoySans-Medium.otf);}
+    @font-face {font-family: 'SvyaznoySans'; src: url(<%= __DEF_PROTOCOL__ + __HOST__%>/portal/bs/portal_bootstrap/scripts/fonts/SvyaznoySans-Medium.otf);}
     table {width: 100%; margin-top: 2%; text-align: center; border-radius: 10px; border-collapse: separate; border-spacing: 5px; letter-spacing: 2px;}
     table thead tr {color: #ffffff; background: #a770ef; font-family: 'SvyaznoySans'; font-size: 12px;}
     table tr td {border-right: 1px solid #dfdfdf;}
@@ -270,6 +268,6 @@
 
     </script>
 </body>
-<script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/validator.min.js?<%=ac%>" async='false'></script>
-<script type="text/javascript" src="http://<%=Request.UrlHost%>/portal/bs/portal_bootstrap/scripts/form-scripts.js?<%=ac%>" async='false'></script>
+<script type="text/javascript" src="<%= __DEF_PROTOCOL__ + __HOST__%>/portal/bs/portal_bootstrap/scripts/validator.min.js?<%=ac%>" async='false'></script>
+<script type="text/javascript" src="<%= __DEF_PROTOCOL__ + __HOST__%>/portal/bs/portal_bootstrap/scripts/form-scripts.js?<%=ac%>" async='false'></script>
 </html>
